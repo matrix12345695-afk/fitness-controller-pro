@@ -1,5 +1,4 @@
 from sqlalchemy import ForeignKey, Text
-
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import BaseModel
@@ -41,3 +40,9 @@ class Answer(BaseModel):
         back_populates="answer",
         cascade="all, delete-orphan",
     )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Answer(report={self.report_id}, "
+            f"question={self.question_id})>"
+        )
