@@ -10,6 +10,14 @@ class QuestionEngine:
     It only manages the survey flow.
     """
 
+    PHOTO_REQUIRED_MESSAGE = (
+        "📷 Для этого вопроса необходимо прикрепить фотографию."
+    )
+
+    EMPTY_ANSWER_MESSAGE = (
+        "✍️ Ответ не может быть пустым."
+    )
+
     def __init__(
         self,
         question_repository: QuestionRepository,
@@ -33,14 +41,27 @@ class QuestionEngine:
 
         return questions[0]
 
+    async def get_question(
+        self,
+        question_id: int,
+    ) -> Question | None:
+        """
+        Return question by ID.
+        """
+        return await self.questions.get(
+            question_id,
+        )
+
     async def get_next_question(
         self,
         current_order: int,
     ) -> Question | None:
         """
-        Return next question.
+        Return next active question.
         """
-        return await self.questions.get_next(current_order)
+        return await self.questions.get_next(
+            current_order,
+        )
 
     async def has_next(
         self,
@@ -49,21 +70,22 @@ class QuestionEngine:
         """
         Check if next question exists.
         """
-        question = await self.get_next_question(
-            current_order
+        return (
+            await self.get_next_question(
+                current_order,
+            )
+            is not None
         )
-
-        return question is not None
 
     async def is_last(
         self,
         current_order: int,
     ) -> bool:
         """
-        Check if current question is last.
+        Check whether current question is last.
         """
         return not await self.has_next(
-            current_order
+            current_order,
         )
 
     def validate_answer(
@@ -73,25 +95,23 @@ class QuestionEngine:
         has_photo: bool = False,
     ) -> tuple[bool, str | None]:
         """
-        Validate answer before saving.
+        Validate user answer.
         """
 
-        if question.photo_required:
-
-            if not has_photo:
-                return (
-                    False,
-                    "Для этого вопроса необходимо прикрепить фотографию.",
-                )
+        if question.photo_required and not has_photo:
+            return (
+                False,
+                self.PHOTO_REQUIRED_MESSAGE,
+            )
 
         if text is not None:
 
             text = text.strip()
 
-            if len(text) == 0:
+            if not text:
                 return (
                     False,
-                    "Ответ не может быть пустым.",
+                    self.EMPTY_ANSWER_MESSAGE,
                 )
 
         return (
@@ -105,10 +125,21 @@ class QuestionEngine:
         language: str,
     ) -> str:
         """
-        Return localized question text.
+        Return localized question.
         """
 
-        if language == "uz":
+        if language.lower() == "uz":
             return question.text_uz
 
         return question.text_ru
+
+    async def total_questions(
+        self,
+    ) -> int:
+        """
+        Return number of active questions.
+        """
+
+        questions = await self.questions.get_active()
+
+        return len(questions)
