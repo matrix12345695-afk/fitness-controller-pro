@@ -1,45 +1,46 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.enums import Language
 from app.repositories.profiles import ProfileRepository
 from app.repositories.users import UserRepository
 from app.schemas.profile import ProfileCreate
 from app.schemas.user import UserCreate
+from app.services.base import BaseService
 
 
-class RegistrationService:
+class RegistrationService(BaseService):
     """
-    User registration service.
+    Registration business logic.
     """
 
-    def __init__(self, session: AsyncSession):
-        self.session = session
+    def __init__(self, session):
+        super().__init__(session)
 
         self.users = UserRepository(session)
         self.profiles = ProfileRepository(session)
 
-    async def is_registered(
+    async def get_user(
+        self,
+        telegram_id: int,
+    ):
+        return await self.users.get_by_telegram_id(
+            telegram_id
+        )
+
+    async def user_exists(
         self,
         telegram_id: int,
     ) -> bool:
-        """
-        Check if user already exists.
-        """
 
-        user = await self.users.get_by_telegram_id(
+        user = await self.get_user(
             telegram_id
         )
 
         return user is not None
 
-    async def register_user(
+    async def create_user(
         self,
         user_data: UserCreate,
         language: Language,
     ):
-        """
-        Create telegram user.
-        """
 
         user = await self.users.create(
             telegram_id=user_data.telegram_id,
@@ -59,11 +60,8 @@ class RegistrationService:
         user_id: int,
         profile: ProfileCreate,
     ):
-        """
-        Create profile.
-        """
 
-        obj = await self.profiles.create(
+        profile = await self.profiles.create(
             user_id=user_id,
             full_name=profile.full_name,
             gender=profile.gender,
@@ -74,12 +72,15 @@ class RegistrationService:
 
         await self.profiles.commit()
 
-        return obj
+        return profile
 
-    async def get_user(
+    async def finish_registration(
         self,
-        telegram_id: int,
+        user_id: int,
+        profile: ProfileCreate,
     ):
-        return await self.users.get_by_telegram_id(
-            telegram_id
+
+        return await self.create_profile(
+            user_id,
+            profile,
         )
