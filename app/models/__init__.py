@@ -18,7 +18,7 @@ __all__ = (
     "Report",
     "Answer",
     "Photo",
-    "Settings",
+    "AppSettings",
     "SurveySession",
     "UserProgress",
 )
