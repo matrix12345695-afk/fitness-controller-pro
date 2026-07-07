@@ -1,21 +1,29 @@
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from app.keyboards.callbacks import LanguageCallback
+
 
 def language_keyboard():
 
     builder = InlineKeyboardBuilder()
 
-    builder.button(
-        text="🇷🇺 Русский",
-        callback_data="lang_ru",
+    builder.row(
+        InlineKeyboardButton(
+            text="🇷🇺 Русский",
+            callback_data=LanguageCallback(
+                language="ru",
+            ).pack(),
+        )
     )
 
-    builder.button(
-        text="🇺🇿 O'zbekcha",
-        callback_data="lang_uz",
+    builder.row(
+        InlineKeyboardButton(
+            text="🇺🇿 O'zbekcha",
+            callback_data=LanguageCallback(
+                language="uz",
+            ).pack(),
+        )
     )
-
-    builder.adjust(1)
 
     return builder.as_markup()
