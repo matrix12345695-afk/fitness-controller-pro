@@ -1,30 +1,32 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.repositories.profiles import ProfileRepository
+from app.services.base import BaseService
 
 
-class ProfileService:
+class ProfileService(BaseService):
+    """
+    Profile service.
+    """
 
-    def __init__(
-        self,
-        session: AsyncSession,
-    ):
+    def __init__(self, session):
+        super().__init__(session)
+
         self.repository = ProfileRepository(session)
 
-    async def get_profile(
+    async def get(
         self,
         user_id: int,
     ):
-        return await self.repository.get(user_id)
-
-    async def create_profile(
-        self,
-        **kwargs,
-    ):
-        profile = await self.repository.create(
-            **kwargs
+        return await self.repository.get(
+            user_id
         )
 
-        await self.repository.commit()
+    async def update_weight(
+        self,
+        profile,
+        weight: float,
+    ):
 
-        return profile
+        return await self.repository.update_weight(
+            profile,
+            weight,
+        )
