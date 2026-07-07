@@ -9,10 +9,22 @@ class ProfileService:
         self,
         session: AsyncSession,
     ):
-        self.profiles = ProfileRepository(session)
+        self.repository = ProfileRepository(session)
 
     async def get_profile(
         self,
         user_id: int,
     ):
-        return await self.profiles.get(user_id)
+        return await self.repository.get(user_id)
+
+    async def create_profile(
+        self,
+        **kwargs,
+    ):
+        profile = await self.repository.create(
+            **kwargs
+        )
+
+        await self.repository.commit()
+
+        return profile
