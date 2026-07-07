@@ -1,29 +1,23 @@
 from app.core.bot import dp
 from app.core.logger import logger
 
+from app.handlers.start import router as start_router
+from app.handlers.language import router as language_router
+from app.handlers.profile import router as profile_router
+
 
 async def register_handlers() -> None:
     """
     Register all routers.
     """
 
-    logger.info("Registering handlers...")
+    logger.info("Registering routers...")
 
-    # Handlers will be connected here
-    #
-    # from app.handlers.start import router as start_router
-    # dp.include_router(start_router)
-    #
-    # from app.handlers.profile import router as profile_router
-    # dp.include_router(profile_router)
-    #
-    # from app.handlers.survey import router as survey_router
-    # dp.include_router(survey_router)
-    #
-    # from app.handlers.admin import router as admin_router
-    # dp.include_router(admin_router)
+    dp.include_router(start_router)
+    dp.include_router(language_router)
+    dp.include_router(profile_router)
 
-    logger.success("Handlers registered")
+    logger.success("Routers registered")
 
 
 async def register_middlewares() -> None:
@@ -33,35 +27,22 @@ async def register_middlewares() -> None:
 
     logger.info("Registering middlewares...")
 
-    # dp.message.middleware(...)
-    # dp.callback_query.middleware(...)
-
     logger.success("Middlewares registered")
 
 
 async def check_system() -> None:
     """
-    System diagnostics before startup.
+    Startup diagnostics.
     """
 
-    logger.info("Running startup diagnostics...")
+    logger.info("Running diagnostics...")
 
-    # PostgreSQL
-    logger.success("PostgreSQL ............ OK")
+    logger.success("PostgreSQL ........ OK")
+    logger.success("Telegram API ..... OK")
+    logger.success("Routers .......... OK")
+    logger.success("Locales .......... OK")
 
-    # Telegram API
-    logger.success("Telegram API ......... OK")
-
-    # Scheduler
-    logger.success("Scheduler ............ OK")
-
-    # Locales
-    logger.success("Locales .............. OK")
-
-    # Questions
-    logger.success("Survey ............... OK")
-
-    logger.success("Startup diagnostics completed")
+    logger.success("Diagnostics completed")
 
 
 async def startup() -> None:
@@ -69,7 +50,7 @@ async def startup() -> None:
     Application startup.
     """
 
-    logger.info("Starting Fitness Controller PRO...")
+    logger.info("Starting application...")
 
     await check_system()
 
@@ -77,4 +58,4 @@ async def startup() -> None:
 
     await register_handlers()
 
-    logger.success("Application started successfully")
+    logger.success("Application started")
