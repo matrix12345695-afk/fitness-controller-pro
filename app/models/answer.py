@@ -32,10 +32,12 @@ class Answer(BaseModel):
         back_populates="answers",
     )
 
-    question = relationship("Question")
+    question = relationship(
+        "Question",
+    )
 
-photos = relationship(
-    "Photo",
-    back_populates="answer",
-    cascade="all, delete-orphan",
-)
+    photos = relationship(
+        "Photo",
+        back_populates="answer",
+        cascade="all, delete-orphan",
+    )
