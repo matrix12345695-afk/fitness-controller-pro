@@ -8,6 +8,8 @@ from app.enums import ReportStatus
 
 from app.models.base import BaseModel
 
+from sqlalchemy import UniqueConstraint
+
 
 class Report(BaseModel):
     """
@@ -45,3 +47,11 @@ class Report(BaseModel):
 
     def __repr__(self):
         return f"<Report(user={self.user_id}, date={self.report_date})>"
+        
+        __table_args__ = (
+    UniqueConstraint(
+        "user_id",
+        "report_date",
+        name="uq_user_report_date",
+    ),
+)
