@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Boolean, DateTime, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import BigInteger, Boolean, DateTime, Enum, String, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.enums import Language, Role
 from app.models.base import BaseModel
 
 
@@ -35,15 +36,15 @@ class User(BaseModel):
         nullable=True,
     )
 
-    language: Mapped[str] = mapped_column(
-        String(5),
-        default="ru",
+    language: Mapped[Language] = mapped_column(
+        Enum(Language),
+        default=Language.RU,
         nullable=False,
     )
 
-    is_admin: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
+    role: Mapped[Role] = mapped_column(
+        Enum(Role),
+        default=Role.USER,
         nullable=False,
     )
 
@@ -59,11 +60,22 @@ class User(BaseModel):
         nullable=False,
     )
 
+    profile = relationship(
+        "Profile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+    reports = relationship(
+        "Report",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
     def __repr__(self) -> str:
         return (
-            f"<User("
-            f"id={self.id}, "
+            f"<User(id={self.id}, "
             f"telegram_id={self.telegram_id}, "
-            f"username={self.username}"
-            f")>"
+            f"role={self.role})>"
         )
