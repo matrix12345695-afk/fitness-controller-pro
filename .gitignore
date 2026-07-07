@@ -1,0 +1,86 @@
+# ============================
+# Python
+# ============================
+
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+
+.idea/
+.vscode/
+
+# Environment
+
+.env
+
+# Logs
+
+logs/
+*.log
+
+# Database
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Alembic
+
+*.pyc
+
+# Cache
+
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+
+# Build
+
+build/
+dist/
+*.egg-info/
+
+# macOS
+
+.DS_Store
+
+# Windows
+
+Thumbs.db
+
+# Coverage
+
+.coverage
+htmlcov/
+
+# Temporary
+
+tmp/
+temp/
+
+# Excel exports
+
+exports/
+*.xlsx
+
+# Render
+
+.render/
+
+# Docker
+
+docker-compose.override.yml
+
+# Local settings
+
+local_settings.py
