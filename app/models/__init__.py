@@ -5,7 +5,7 @@ from app.models.question import Question
 from app.models.report import Report
 from app.models.answer import Answer
 from app.models.photo import Photo
-from app.models.settings import Settings
+from app.models.app_settings import AppSettings
 from app.models.survey_session import SurveySession
 from app.models.user_progress import UserProgress
 
