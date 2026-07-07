@@ -5,8 +5,6 @@ class RegistrationState(StatesGroup):
 
     language = State()
 
-    full_name = State()
-
     gender = State()
 
     birth_date = State()
