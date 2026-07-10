@@ -44,6 +44,21 @@ class Settings(BaseSettings):
     )
 
     environment: str = Field(
+
+        webhook_url: str = Field(
+    default="",
+    alias="WEBHOOK_URL",
+)
+
+webhook_path: str = Field(
+    default="/webhook",
+    alias="WEBHOOK_PATH",
+)
+
+webhook_secret: str = Field(
+    default="fitness-controller-pro",
+    alias="WEBHOOK_SECRET",
+)
         default="production",
         alias="ENVIRONMENT",
     )
