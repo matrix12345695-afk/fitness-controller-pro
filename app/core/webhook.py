@@ -1,7 +1,5 @@
 from aiohttp import web
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode
 from aiogram.webhook.aiohttp_server import (
     SimpleRequestHandler,
     setup_application,
@@ -16,7 +14,7 @@ def create_web_app(
     dp: Dispatcher,
 ) -> web.Application:
     """
-    Create aiohttp application for Telegram webhook.
+    Create aiohttp application.
     """
 
     app = web.Application()
@@ -36,21 +34,11 @@ def create_web_app(
         bot=bot,
     )
 
-    logger.success("Webhook application created")
+    register_routes(app)
+
+    logger.success("Webhook application initialized")
 
     return app
-
-
-async def healthcheck(
-    request: web.Request,
-) -> web.Response:
-    """
-    Render health check.
-    """
-
-    return web.Response(
-        text="Fitness Controller PRO is running!",
-    )
 
 
 def register_routes(
@@ -60,14 +48,35 @@ def register_routes(
     Register HTTP routes.
     """
 
+    async def index(
+        request: web.Request,
+    ) -> web.Response:
+
+        return web.json_response(
+            {
+                "status": "ok",
+                "service": "Fitness Controller PRO",
+            }
+        )
+
+    async def health(
+        request: web.Request,
+    ) -> web.Response:
+
+        return web.json_response(
+            {
+                "status": "healthy",
+            }
+        )
+
     app.router.add_get(
         "/",
-        healthcheck,
+        index,
     )
 
     app.router.add_get(
         "/health",
-        healthcheck,
+        health,
     )
 
     logger.success("HTTP routes registered")
