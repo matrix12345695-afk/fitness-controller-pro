@@ -326,7 +326,7 @@ async def dashboard_remind(
 
     await callback.answer()
 
-    @router.callback_query(
+@router.callback_query(
     F.data == "remind_send",
 )
 async def remind_send(
