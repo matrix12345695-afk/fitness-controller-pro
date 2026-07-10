@@ -362,3 +362,19 @@ async def remind_send(
     await callback.answer(
         "Рассылка выполнена!"
     )
+
+@router.callback_query(
+    F.data == "remind_cancel",
+)
+async def remind_cancel(
+    callback: CallbackQuery,
+):
+    """
+    Cancel reminder.
+    """
+
+    await callback.message.edit_text(
+        "❌ Рассылка отменена."
+    )
+
+    await callback.answer()
