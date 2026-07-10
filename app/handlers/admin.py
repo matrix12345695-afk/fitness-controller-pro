@@ -206,3 +206,40 @@ async def admin_back(
     )
 
     await callback.answer()
+    
+@router.message(
+    F.text == "📊 Сегодня",
+)
+async def today_dashboard(
+    message: Message,
+):
+    """
+    Dashboard for today.
+    """
+
+    if message.from_user.id != settings.admin_id:
+
+        return
+
+    async with SessionLocal() as session:
+
+        service = AdminService(session)
+
+        stats = await service.dashboard_stats()
+
+    text = (
+        "📊 <b>Сегодня</b>\n\n"
+
+        f"👥 Пользователей: <b>{stats['total_users']}</b>\n\n"
+
+        f"✅ Прошли опрос: <b>{stats['completed_today']}</b>\n"
+
+        f"❌ Не прошли: <b>{stats['not_completed_today']}</b>\n\n"
+
+        f"📈 Выполнение: <b>{stats['completion_percent']}%</b>"
+    )
+
+    await message.answer(
+        text,
+        parse_mode="HTML",
+    )    
