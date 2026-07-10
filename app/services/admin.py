@@ -18,9 +18,23 @@ class AdminService:
             session,
         )
 
-    async def get_users(self):
+    async def get_users(
+        self,
+    ):
         """
-        Return all users.
+        Get all users.
         """
 
         return await self.users.get_all()
+
+    async def get_user(
+        self,
+        user_id: int,
+    ):
+        """
+        Get user by id.
+        """
+
+        return await self.users.get(
+            user_id,
+        )
