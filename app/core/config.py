@@ -38,29 +38,34 @@ class Settings(BaseSettings):
         alias="TIMEZONE",
     )
 
-    default_language: str = Field(
+        default_language: str = Field(
         default="ru",
         alias="DEFAULT_LANGUAGE",
     )
 
     environment: str = Field(
-
-        webhook_url: str = Field(
-    default="",
-    alias="WEBHOOK_URL",
-)
-
-webhook_path: str = Field(
-    default="/webhook",
-    alias="WEBHOOK_PATH",
-)
-
-webhook_secret: str = Field(
-    default="fitness-controller-pro",
-    alias="WEBHOOK_SECRET",
-)
         default="production",
         alias="ENVIRONMENT",
+    )
+
+    webhook_url: str = Field(
+        default="",
+        alias="WEBHOOK_URL",
+    )
+
+    webhook_path: str = Field(
+        default="/webhook",
+        alias="WEBHOOK_PATH",
+    )
+
+    webhook_secret: str = Field(
+        default="fitness-controller-pro",
+        alias="WEBHOOK_SECRET",
+    )
+
+    port: int = Field(
+        default=10000,
+        alias="PORT",
     )
 
     port: int = Field(
