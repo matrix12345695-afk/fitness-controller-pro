@@ -10,6 +10,7 @@ from app.handlers.start import router as start_router
 from app.handlers.language import router as language_router
 from app.handlers.profile import router as profile_router
 from app.handlers.survey import router as survey_router
+from app.core.seed_questions import seed_questions
 
 
 # ==========================================================
@@ -105,6 +106,8 @@ async def startup() -> None:
     logger.info("Starting application...")
 
     await create_database()
+
+    await seed_questions()
 
     await register_middlewares()
 
