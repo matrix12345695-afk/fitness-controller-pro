@@ -78,11 +78,7 @@ async def start_survey(
 
         )
 
-        await state.set_state(
-            SurveyState.waiting_answer,
-        )
-
-        question_text = survey.engine.get_question_text(
+                question_text = survey.engine.get_question_text(
             question,
             user.language.value,
         )
@@ -91,34 +87,34 @@ async def start_survey(
 
             await state.set_state(
                 SurveyState.waiting_photo,
+            )
+
+            question_text += (
+                "\n\n"
+                "📷 Прикрепите фотографию."
+            )
+
+        else:
+
+            await state.set_state(
+                SurveyState.waiting_answer,
+            )
+
+        await message.answer(
+            question_text,
         )
-
-        question_text += (
-            "\n\n"
-            "📷 Прикрепите фотографию."
-        )
-
-    else:
-
-        await state.set_state(
-            SurveyState.waiting_answer,
-        )
-
-    await message.answer(
-        question_text,
-    )
 
     @router.message(
-        SurveyState.waiting_answer,
-        F.text,
-    )
-    async def process_answer(
-        message: Message,
-        state: FSMContext,
-    ):
-    """
-    Process text answer.
-    """
+    SurveyState.waiting_answer,
+    F.text,
+)
+async def process_answer(
+    message: Message,
+    state: FSMContext,
+):
+        """
+        Process text answer.
+        """
 
     data = await state.get_data()
 
