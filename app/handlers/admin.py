@@ -1,3 +1,4 @@
+from app.keyboards.admin import users_keyboard
 from aiogram import F, Router
 from aiogram.types import Message
 
@@ -64,18 +65,15 @@ async def users_list(
     message: Message,
 ):
     """
-    Show all registered users.
+    Show all users.
     """
 
     if message.from_user.id != settings.admin_id:
-
         return
 
     async with SessionLocal() as session:
 
-        service = AdminService(
-            session,
-        )
+        service = AdminService(session)
 
         users = await service.get_users()
 
@@ -87,8 +85,10 @@ async def users_list(
 
         return
 
-    text = (
-        "👥 <b>Пользователи</b>\n\n"
+    await message.answer(
+        "👥 <b>Список пользователей</b>\n\nВыберите пользователя:",
+        reply_markup=users_keyboard(users),
+        parse_mode="HTML",
     )
 
     for index, user in enumerate(
