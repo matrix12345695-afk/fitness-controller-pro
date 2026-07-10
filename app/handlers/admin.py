@@ -13,6 +13,7 @@ from app.keyboards.reply import admin_menu
 from app.repositories.profiles import ProfileRepository
 from app.services.admin import AdminService
 from app.keyboards.dashboard import dashboard_keyboard
+from app.keyboards.remind import remind_confirm_keyboard
 
 router = Router()
 
@@ -261,3 +262,65 @@ async def today_dashboard(
         parse_mode="HTML",
         reply_markup=dashboard_keyboard(),
     )
+
+@router.callback_query(
+    F.data == "dashboard_remind",
+)
+async def dashboard_remind(
+    callback: CallbackQuery,
+):
+    """
+    Reminder confirmation.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+
+        await callback.answer()
+
+        return
+
+    async with SessionLocal() as session:
+
+        service = AdminService(session)
+
+        users = await service.users_without_report_today()
+
+    if not users:
+
+        await callback.answer(
+            "🎉 Все уже прошли опрос!",
+            show_alert=True,
+        )
+
+        return
+
+    text = (
+        "📢 <b>Напоминание</b>\n\n"
+
+        f"Получателей: <b>{len(users)}</b>\n\n"
+
+        "Сообщение будет отправлено:\n\n"
+    )
+
+    for user in users[:10]:
+
+        name = user.first_name or "Без имени"
+
+        if user.last_name:
+            name += f" {user.last_name}"
+
+        text += f"👤 {name}\n"
+
+    if len(users) > 10:
+
+        text += (
+            f"\n...и ещё {len(users)-10}"
+        )
+
+    await callback.message.edit_text(
+        text,
+        parse_mode="HTML",
+        reply_markup=remind_confirm_keyboard(),
+    )
+
+    await callback.answer()
