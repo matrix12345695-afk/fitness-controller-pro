@@ -40,7 +40,9 @@ class DashboardRepository(BaseRepository):
 
         return result.scalar_one()
 
-    async def users_today(self):
+    async def users_today(
+        self,
+    ):
         """
         Reports for today.
         """
@@ -57,7 +59,37 @@ class DashboardRepository(BaseRepository):
 
         return await self.scalars(stmt)
 
-    async def completion_percent(self) -> int:
+    async def users_without_report_today(
+        self,
+    ):
+        """
+        Users who have not completed today's report.
+        """
+
+        today = date.today()
+
+        subquery = (
+            select(Report.user_id)
+            .where(
+                Report.report_date == today
+            )
+        )
+
+        stmt = (
+            select(User)
+            .where(
+                User.id.not_in(subquery)
+            )
+            .order_by(
+                User.first_name
+            )
+        )
+
+        return await self.scalars(stmt)
+
+    async def completion_percent(
+        self,
+    ) -> int:
         """
         Completion percent.
         """
@@ -73,7 +105,9 @@ class DashboardRepository(BaseRepository):
             completed / total * 100
         )
 
-    async def not_completed_today(self) -> int:
+    async def not_completed_today(
+        self,
+    ) -> int:
         """
         Users without report.
         """
