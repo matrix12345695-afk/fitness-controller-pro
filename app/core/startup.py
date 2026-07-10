@@ -2,6 +2,7 @@ import app.models
 
 from app.core.database import engine
 from app.models.base import Base
+
 from app.core.bot import dp
 from app.core.logger import logger
 
@@ -10,6 +11,29 @@ from app.handlers.language import router as language_router
 from app.handlers.profile import router as profile_router
 from app.handlers.survey import router as survey_router
 
+
+# ==========================================================
+# DATABASE
+# ==========================================================
+
+async def create_database() -> None:
+    """
+    Create database tables.
+    """
+
+    logger.info("Creating database tables...")
+
+    async with engine.begin() as conn:
+        await conn.run_sync(
+            Base.metadata.create_all,
+        )
+
+    logger.success("Database ready")
+
+
+# ==========================================================
+# HANDLERS
+# ==========================================================
 
 async def register_handlers() -> None:
     """
@@ -26,6 +50,10 @@ async def register_handlers() -> None:
     logger.success("Routers registered")
 
 
+# ==========================================================
+# MIDDLEWARES
+# ==========================================================
+
 async def register_middlewares() -> None:
     """
     Register middlewares.
@@ -35,6 +63,10 @@ async def register_middlewares() -> None:
 
     logger.success("Middlewares registered")
 
+
+# ==========================================================
+# DIAGNOSTICS
+# ==========================================================
 
 async def check_system() -> None:
     """
@@ -50,20 +82,12 @@ async def check_system() -> None:
 
     logger.success("Diagnostics completed")
 
-async def create_database() -> None:
-    """
-    Create database tables.
-    """
 
-    logger.info("Creating database tables...")
+# ==========================================================
+# STARTUP
+# ==========================================================
 
-    async with engine.begin() as conn:
-
-        await conn.run_sync(
-            Base.metadata.create_all,
-        )
-
-    logger.success("Database ready")
+_started = False
 
 
 async def startup() -> None:
@@ -71,16 +95,21 @@ async def startup() -> None:
     Application startup.
     """
 
+    global _started
+
+    if _started:
+        return
+
+    _started = True
+
     logger.info("Starting application...")
 
     await create_database()
-
-    await check_system()
 
     await register_middlewares()
 
     await register_handlers()
 
+    await check_system()
+
     logger.success("Application started")
-
-
