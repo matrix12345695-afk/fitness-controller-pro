@@ -3,6 +3,7 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
+from app.core.config import settings
 from app.core.database import SessionLocal
 from app.keyboards.inline import language_keyboard
 from app.keyboards.reply import (
@@ -29,7 +30,9 @@ async def start_command(
 
     async with SessionLocal() as session:
 
-        registration = RegistrationService(session)
+        registration = RegistrationService(
+            session,
+        )
 
         user = await registration.get_user(
             message.from_user.id,
@@ -37,29 +40,37 @@ async def start_command(
 
         if user:
 
-            if getattr(user, "role", None) and user.role.value == "ADMIN":
+            # Администратор
+            if message.from_user.id == settings.admin_id:
 
                 await message.answer(
                     text=f"👋 Добро пожаловать обратно, <b>{message.from_user.full_name}</b>!",
                     reply_markup=admin_menu(),
+                    parse_mode="HTML",
                 )
 
                 return
 
+            # Обычный пользователь (RU)
             if user.language.value == "ru":
 
                 await message.answer(
                     text=f"👋 С возвращением, <b>{message.from_user.full_name}</b>!",
                     reply_markup=main_menu_ru(
                         message.from_user.id,
+                    ),
+                    parse_mode="HTML",
                 )
 
+            # Обычный пользователь (UZ)
             else:
 
                 await message.answer(
                     text=f"👋 Xush kelibsiz, <b>{message.from_user.full_name}</b>!",
                     reply_markup=main_menu_uz(
                         message.from_user.id,
+                    ),
+                    parse_mode="HTML",
                 )
 
             return
@@ -76,4 +87,5 @@ async def start_command(
             "Boshlash uchun tilni tanlang."
         ),
         reply_markup=language_keyboard(),
+        parse_mode="HTML",
     )
