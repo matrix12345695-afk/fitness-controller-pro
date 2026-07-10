@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: fitness-controller-pro
+
+    runtime: python
+
+    plan: free
+
+    buildCommand: pip install -r requirements.txt
+
+    startCommand: python run.py
+
+    autoDeploy: true
