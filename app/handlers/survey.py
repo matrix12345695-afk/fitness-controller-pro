@@ -161,21 +161,21 @@ async def process_answer(
 
             if language == "uz":
 
-        await message.answer(
-            "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
-                reply_markup=main_menu_uz(
-                message.from_user.id,
-                ),
-        )
+                await message.answer(
+                    "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
+                    reply_markup=main_menu_uz(
+                        message.from_user.id,
+                    ),
+                )
 
             else:
 
-        await message.answer(
-            "✅ Опрос успешно завершён!",
-            reply_markup=main_menu_ru(
-                message.from_user.id,
-            ),
-        )
+                await message.answer(
+                    "✅ Опрос успешно завершён!",
+                    reply_markup=main_menu_ru(
+                        message.from_user.id,
+                    ),
+                )
 
             return
 
@@ -266,20 +266,21 @@ async def process_photo(
 
             if language == "uz":
 
-        await message.answer(
-            "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
-            reply_markup=main_menu_uz(
-                message.from_user.id,
-        )
+                await message.answer(
+                    "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
+                    reply_markup=main_menu_uz(
+                        message.from_user.id,
+                    ),
+                )
 
             else:
 
-        await message.answer(
-            "✅ Опрос успешно завершён!",
-            reply_markup=main_menu_ru(
-                message.from_user.id,
-            ),
-        )
+                await message.answer(
+                    "✅ Опрос успешно завершён!",
+                    reply_markup=main_menu_ru(
+                        message.from_user.id,
+                    ),
+                )
 
             return
 
