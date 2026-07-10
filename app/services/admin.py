@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.repositories.dashboard import DashboardRepository
 from app.repositories.users import UserRepository
 
 
@@ -15,6 +16,10 @@ class AdminService:
         self.session = session
 
         self.users = UserRepository(
+            session,
+        )
+
+        self.dashboard = DashboardRepository(
             session,
         )
 
@@ -47,27 +52,34 @@ class AdminService:
         self,
     ) -> int:
         """
-        Total users count.
+        Total users.
         """
 
-        return await self.users.count()
+        return await self.dashboard.total_users()
 
     # ==========================================================
     # DASHBOARD
     # ==========================================================
 
-    async def dashboard(
+    async def dashboard_stats(
         self,
     ) -> dict:
         """
-        Dashboard data.
+        Dashboard statistics.
         """
 
-        total = await self.total_users()
-
         return {
-            "total_users": total,
-            "completed_today": 0,
-            "not_completed_today": total,
-            "completion_percent": 0,
+            "total_users": await self.dashboard.total_users(),
+            "completed_today": await self.dashboard.completed_today(),
+            "not_completed_today": await self.dashboard.not_completed_today(),
+            "completion_percent": await self.dashboard.completion_percent(),
         }
+
+    async def reports_today(
+        self,
+    ):
+        """
+        Reports for today.
+        """
+
+        return await self.dashboard.users_today()
