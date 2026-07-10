@@ -14,6 +14,7 @@ from app.repositories.profiles import ProfileRepository
 from app.services.admin import AdminService
 from app.keyboards.dashboard import dashboard_keyboard
 from app.keyboards.remind import remind_confirm_keyboard
+from app.core.bot import bot
 
 router = Router()
 
@@ -324,3 +325,40 @@ async def dashboard_remind(
     )
 
     await callback.answer()
+
+    @router.callback_query(
+    F.data == "remind_send",
+)
+async def remind_send(
+    callback: CallbackQuery,
+):
+    """
+    Send reminder to all users without today's report.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+
+        await callback.answer()
+
+        return
+
+    async with SessionLocal() as session:
+
+        service = AdminService(session)
+
+        success, failed = await service.remind_users_today(
+            bot,
+        )
+
+    await callback.message.edit_text(
+        (
+            "✅ <b>Рассылка завершена</b>\n\n"
+            f"📨 Успешно отправлено: <b>{success}</b>\n"
+            f"❌ Ошибок: <b>{failed}</b>"
+        ),
+        parse_mode="HTML",
+    )
+
+    await callback.answer(
+        "Рассылка выполнена!"
+    )
