@@ -65,7 +65,7 @@ async def start_survey(
 
         report = result["report"]
         question = result["question"]
-                if question is None:
+        if question is None:
 
             await message.answer(
                 "Нет доступных вопросов."
