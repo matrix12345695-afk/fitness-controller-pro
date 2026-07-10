@@ -12,6 +12,7 @@ from app.keyboards.reply import admin_menu
 
 from app.repositories.profiles import ProfileRepository
 from app.services.admin import AdminService
+from app.keyboards.dashboard import dashboard_keyboard
 
 router = Router()
 
@@ -218,7 +219,6 @@ async def today_dashboard(
     """
 
     if message.from_user.id != settings.admin_id:
-
         return
 
     async with SessionLocal() as session:
@@ -227,19 +227,37 @@ async def today_dashboard(
 
         stats = await service.dashboard_stats()
 
+        users = await service.users_without_report_today()
+
     text = (
         "📊 <b>Сегодня</b>\n\n"
 
-        f"👥 Пользователей: <b>{stats['total_users']}</b>\n\n"
+        f"👥 Пользователей: <b>{stats['total_users']}</b>\n"
 
-        f"✅ Прошли опрос: <b>{stats['completed_today']}</b>\n"
+        f"✅ Прошли: <b>{stats['completed_today']}</b>\n"
 
-        f"❌ Не прошли: <b>{stats['not_completed_today']}</b>\n\n"
+        f"❌ Не прошли: <b>{stats['not_completed_today']}</b>\n"
 
-        f"📈 Выполнение: <b>{stats['completion_percent']}%</b>"
+        f"📈 Выполнение: <b>{stats['completion_percent']}%</b>\n"
     )
+
+    if users:
+
+        text += "\n──────────────\n\n"
+
+        text += "❌ <b>Не прошли:</b>\n\n"
+
+        for user in users:
+
+            name = user.first_name or "Без имени"
+
+            if user.last_name:
+                name += f" {user.last_name}"
+
+            text += f"👤 {name}\n"
 
     await message.answer(
         text,
         parse_mode="HTML",
-    )    
+        reply_markup=dashboard_keyboard(),
+    )
