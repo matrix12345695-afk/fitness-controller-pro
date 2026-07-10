@@ -12,6 +12,7 @@ from app.handlers.profile import router as profile_router
 from app.handlers.survey import router as survey_router
 from app.core.seed_questions import seed_questions
 from app.handlers.account import router as account_router
+from app.handlers.admin import router as admin_router
 
 
 # ==========================================================
