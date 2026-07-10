@@ -29,44 +29,44 @@ class Settings(BaseSettings):
 
     database_url: str = Field(..., alias="DATABASE_URL")
 
-    # ==========================================================
+       # ==========================================================
     # General
     # ==========================================================
 
     timezone: str = Field(
-    default="Asia/Tashkent",
-    alias="TIMEZONE",
-)
+        default="Asia/Tashkent",
+        alias="TIMEZONE",
+    )
 
-default_language: str = Field(
-    default="ru",
-    alias="DEFAULT_LANGUAGE",
-)
+    default_language: str = Field(
+        default="ru",
+        alias="DEFAULT_LANGUAGE",
+    )
 
-environment: str = Field(
-    default="production",
-    alias="ENVIRONMENT",
-)
+    environment: str = Field(
+        default="production",
+        alias="ENVIRONMENT",
+    )
 
-webhook_url: str = Field(
-    default="",
-    alias="WEBHOOK_URL",
-)
+    webhook_url: str = Field(
+        default="",
+        alias="WEBHOOK_URL",
+    )
 
-webhook_path: str = Field(
-    default="/webhook",
-    alias="WEBHOOK_PATH",
-)
+    webhook_path: str = Field(
+        default="/webhook",
+        alias="WEBHOOK_PATH",
+    )
 
-webhook_secret: str = Field(
-    default="fitness-controller-pro",
-    alias="WEBHOOK_SECRET",
-)
+    webhook_secret: str = Field(
+        default="fitness-controller-pro",
+        alias="WEBHOOK_SECRET",
+    )
 
-port: int = Field(
-    default=10000,
-    alias="PORT",
-)
+    port: int = Field(
+        default=10000,
+        alias="PORT",
+    )
 
     # ==========================================================
     # Survey
