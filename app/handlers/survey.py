@@ -163,14 +163,16 @@ async def process_answer(
 
                 await message.answer(
                     "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
-                    reply_markup=main_menu_uz(),
+                    reply_markup=main_menu_uz(
+                        message.from_user.id,
                 )
 
             else:
 
                 await message.answer(
                     "✅ Опрос успешно завершён!",
-                    reply_markup=main_menu_ru(),
+                    reply_markup=main_menu_ru(
+                        message.from_user.id,
                 )
 
             return
@@ -264,14 +266,16 @@ async def process_photo(
 
                 await message.answer(
                     "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
-                    reply_markup=main_menu_uz(),
+                    reply_markup=main_menu_uz(
+                        message.from_user.id,
                 )
 
             else:
 
                 await message.answer(
                     "✅ Опрос успешно завершён!",
-                    reply_markup=main_menu_ru(),
+                    reply_markup=main_menu_ru(
+                        message.from_user.id,
                 )
 
             return
