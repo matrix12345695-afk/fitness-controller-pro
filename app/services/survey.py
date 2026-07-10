@@ -58,12 +58,28 @@ class SurveyService(BaseService):
         )
 
     async def process_answer(
-        self,
-        report_id: int,
-        question,
-        text: str | None = None,
-        telegram_file_id: str | None = None,
-    ):
+    self,
+    report_id: int,
+    question_id: int,
+    text: str | None = None,
+    telegram_file_id: str | None = None,
+):
+    question = await self.engine.get_question(
+        question_id,
+    )
+
+    if question is None:
+        return {
+            "success": False,
+            "error": "Question not found.",
+        }
+
+    return await self.answer.execute(
+        report_id=report_id,
+        question=question,
+        text=text,
+        telegram_file_id=telegram_file_id,
+    )
         """
         Process survey answer.
         """
