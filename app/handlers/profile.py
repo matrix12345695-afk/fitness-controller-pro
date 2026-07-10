@@ -212,12 +212,14 @@ async def save_weight(
 
         await message.answer(
             "✅ Регистрация завершена!",
-            reply_markup=main_menu_ru(),
+            reply_markup=main_menu_ru(
+                message.from_user.id,
         )
 
     else:
 
         await message.answer(
             "✅ Ro'yxatdan o'tish yakunlandi!",
-            reply_markup=main_menu_uz(),
+            reply_markup=main_menu_uz(
+                message.from_user.id,
         )
