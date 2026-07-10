@@ -50,14 +50,16 @@ async def start_command(
 
                 await message.answer(
                     text=f"👋 С возвращением, <b>{message.from_user.full_name}</b>!",
-                    reply_markup=main_menu_ru(),
+                    reply_markup=main_menu_ru(
+                        message.from_user.id,
                 )
 
             else:
 
                 await message.answer(
                     text=f"👋 Xush kelibsiz, <b>{message.from_user.full_name}</b>!",
-                    reply_markup=main_menu_uz(),
+                    reply_markup=main_menu_uz(
+                        message.from_user.id,
                 )
 
             return
