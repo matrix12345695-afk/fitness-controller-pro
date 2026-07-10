@@ -8,7 +8,7 @@ from app.core.logger import logger
 
 
 # ==========================================================
-# Telegram Bot
+# BOT
 # ==========================================================
 
 bot = Bot(
@@ -20,14 +20,14 @@ bot = Bot(
 
 
 # ==========================================================
-# FSM Storage
+# STORAGE
 # ==========================================================
 
 storage = MemoryStorage()
 
 
 # ==========================================================
-# Dispatcher
+# DISPATCHER
 # ==========================================================
 
 dp = Dispatcher(
@@ -36,47 +36,62 @@ dp = Dispatcher(
 
 
 # ==========================================================
-# Startup
+# STARTUP
 # ==========================================================
 
 async def on_startup() -> None:
     """
-    Startup hook.
+    Bot startup.
     """
 
-    logger.info("========================================")
-    logger.info(" Fitness Controller PRO")
-    logger.info(" Version: 1.0.0")
-    logger.info("========================================")
+    logger.info("=======================================")
+    logger.info("Fitness Controller PRO")
+    logger.info("Webhook mode")
+    logger.info("=======================================")
+
+    webhook_url = (
+        settings.webhook_url.rstrip("/")
+        + settings.webhook_path
+    )
 
     await bot.delete_webhook(
         drop_pending_updates=True,
     )
 
     await bot.set_webhook(
-        url=f"{settings.webhook_url}{settings.webhook_path}",
+        url=webhook_url,
         secret_token=settings.webhook_secret,
         drop_pending_updates=True,
     )
 
-    logger.success("Webhook installed")
-    logger.success("Bot initialized")
+    logger.success(f"Webhook installed: {webhook_url}")
+
+    me = await bot.get_me()
+
+    logger.success(
+        f"Authorized as @{me.username}"
+    )
 
 
 # ==========================================================
-# Shutdown
+# SHUTDOWN
 # ==========================================================
 
 async def on_shutdown() -> None:
     """
-    Shutdown hook.
+    Bot shutdown.
     """
 
-    logger.info("Stopping bot...")
+    logger.info("Removing webhook...")
 
-    await bot.delete_webhook()
+    try:
+        await bot.delete_webhook()
+
+    except Exception as e:
+        logger.warning(
+            f"Webhook remove error: {e}"
+        )
 
     await bot.session.close()
 
-    logger.success("Webhook removed")
     logger.success("Bot stopped")
