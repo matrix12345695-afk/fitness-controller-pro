@@ -11,6 +11,7 @@ from app.handlers.language import router as language_router
 from app.handlers.profile import router as profile_router
 from app.handlers.survey import router as survey_router
 from app.core.seed_questions import seed_questions
+from app.handlers.account import router as account_router
 
 
 # ==========================================================
@@ -46,6 +47,7 @@ async def register_handlers() -> None:
     dp.include_router(start_router)
     dp.include_router(language_router)
     dp.include_router(profile_router)
+    dp.include_router(account_router)
     dp.include_router(survey_router)
 
     logger.success("Routers registered")
