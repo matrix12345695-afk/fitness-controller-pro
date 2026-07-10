@@ -83,3 +83,10 @@ class AdminService:
         """
 
         return await self.dashboard.users_today()
+
+    async def users_without_report_today(self):
+        """
+        Users without today's report.
+        """
+
+        return await self.dashboard.users_without_report_today()
