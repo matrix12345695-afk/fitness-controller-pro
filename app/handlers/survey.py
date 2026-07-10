@@ -89,33 +89,33 @@ async def start_survey(
 
         if question.photo_required:
 
-    await state.set_state(
-        SurveyState.waiting_photo,
+        await state.set_state(
+            SurveyState.waiting_photo,
+        )
+
+        question_text += (
+            "\n\n"
+            "📷 Прикрепите фотографию."
+        )
+
+    else:
+
+        await state.set_state(
+            SurveyState.waiting_answer,
+        )
+
+    await message.answer(
+        question_text,
     )
 
-    question_text += (
-        "\n\n"
-        "📷 Прикрепите фотографию."
-    )
-
-else:
-
-    await state.set_state(
+    @router.message(
         SurveyState.waiting_answer,
+        F.text,
     )
-
-await message.answer(
-    question_text,
-)
-
-@router.message(
-    SurveyState.waiting_answer,
-    F.text,
-)
-async def process_answer(
-    message: Message,
-    state: FSMContext,
-):
+    async def process_answer(
+        message: Message,
+        state: FSMContext,
+    ):
     """
     Process text answer.
     """
