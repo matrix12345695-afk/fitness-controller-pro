@@ -1,12 +1,16 @@
-from app.keyboards.admin import users_keyboard
 from aiogram import F, Router
-from aiogram.types import Message
+from aiogram.types import (
+    CallbackQuery,
+    Message,
+)
 
 from app.core.config import settings
 from app.core.database import SessionLocal
 
+from app.keyboards.admin import users_keyboard
 from app.keyboards.reply import admin_menu
 
+from app.repositories.profiles import ProfileRepository
 from app.services.admin import AdminService
 
 router = Router()
@@ -39,23 +43,19 @@ async def admin_panel(
 
         return
 
-    text = (
-        "👨‍💼 <b>Панель администратора</b>\n\n"
-
-        "Добро пожаловать!\n\n"
-
-        "Выберите необходимый раздел."
-    )
-
     await message.answer(
-        text,
+        (
+            "👨‍💼 <b>Панель администратора</b>\n\n"
+            "Добро пожаловать!\n\n"
+            "Выберите раздел."
+        ),
         reply_markup=admin_menu(),
         parse_mode="HTML",
     )
 
 
 # ==========================================================
-# USERS
+# USERS LIST
 # ==========================================================
 
 @router.message(
@@ -86,39 +86,123 @@ async def users_list(
         return
 
     await message.answer(
-        "👥 <b>Список пользователей</b>\n\nВыберите пользователя:",
+        "👥 <b>Список пользователей</b>\n\n"
+        "Выберите пользователя:",
         reply_markup=users_keyboard(users),
         parse_mode="HTML",
     )
 
-    for index, user in enumerate(
-        users,
-        start=1,
-    ):
 
-        full_name = user.first_name or ""
+# ==========================================================
+# USER CARD
+# ==========================================================
 
-        if user.last_name:
+@router.callback_query(
+    F.data.startswith("user:")
+)
+async def user_card(
+    callback: CallbackQuery,
+):
+    """
+    Show user information.
+    """
 
-            full_name += (
-                f" {user.last_name}"
-            )
+    if callback.from_user.id != settings.admin_id:
 
-        if not full_name.strip():
+        await callback.answer()
 
-            full_name = (
-                f"ID {user.id}"
-            )
+        return
 
-        text += (
-            f"{index}. {full_name}\n"
-        )
-
-    text += (
-        f"\n👤 Всего пользователей: {len(users)}"
+    user_id = int(
+        callback.data.split(":")[1]
     )
 
-    await message.answer(
+    async with SessionLocal() as session:
+
+        service = AdminService(session)
+
+        user = await service.get_user(
+            user_id,
+        )
+
+        profile = await ProfileRepository(
+            session,
+        ).get(
+            user_id,
+        )
+
+    if user is None:
+
+        await callback.answer(
+            "Пользователь не найден.",
+            show_alert=True,
+        )
+
+        return
+
+    text = (
+        f"👤 <b>{user.first_name}</b>"
+    )
+
+    if user.last_name:
+
+        text += f" {user.last_name}"
+
+    text += "\n\n"
+
+    text += (
+        f"🆔 ID: <code>{user.telegram_id}</code>\n"
+    )
+
+    if user.username:
+
+        text += (
+            f"👤 Username: @{user.username}\n"
+        )
+
+    if profile:
+
+        text += (
+            f"\n📏 Рост: {profile.height} см\n"
+            f"⚖️ Вес: {profile.start_weight} кг\n"
+            f"👤 Пол: {profile.gender.value}\n"
+            f"🎂 Дата рождения: {profile.birth_date}\n"
+        )
+
+    await callback.message.edit_text(
         text,
         parse_mode="HTML",
     )
+
+    await callback.answer()
+
+
+# ==========================================================
+# BACK
+# ==========================================================
+
+@router.callback_query(
+    F.data == "admin_back",
+)
+async def admin_back(
+    callback: CallbackQuery,
+):
+    """
+    Back to admin panel.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+
+        await callback.answer()
+
+        return
+
+    await callback.message.edit_text(
+        (
+            "👨‍💼 <b>Панель администратора</b>\n\n"
+            "Выберите раздел."
+        ),
+        parse_mode="HTML",
+    )
+
+    await callback.answer()
