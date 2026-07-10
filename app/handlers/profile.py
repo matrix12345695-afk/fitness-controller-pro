@@ -134,7 +134,9 @@ async def save_height(
 
     if not message.text.isdigit():
 
-        await message.answer("Введите число.")
+        await message.answer(
+            "Введите число."
+        )
 
         return
 
@@ -189,7 +191,9 @@ async def save_weight(
 
     async with SessionLocal() as session:
 
-        service = RegistrationService(session)
+        service = RegistrationService(
+            session,
+        )
 
         user = await service.get_user(
             message.from_user.id,
@@ -214,6 +218,7 @@ async def save_weight(
             "✅ Регистрация завершена!",
             reply_markup=main_menu_ru(
                 message.from_user.id,
+            ),
         )
 
     else:
@@ -222,4 +227,5 @@ async def save_weight(
             "✅ Ro'yxatdan o'tish yakunlandi!",
             reply_markup=main_menu_uz(
                 message.from_user.id,
+            ),
         )
