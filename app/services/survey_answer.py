@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.question import Question
 from app.repositories.answers import AnswerRepository
 from app.repositories.photos import PhotoRepository
 from app.services.question_engine import QuestionEngine
@@ -16,7 +17,6 @@ class SurveyAnswerService:
         engine: QuestionEngine,
     ):
         self.session = session
-
         self.engine = engine
 
         self.answers = AnswerRepository(session)
@@ -25,7 +25,7 @@ class SurveyAnswerService:
     async def execute(
         self,
         report_id: int,
-        question,
+        question: Question,
         text: str | None = None,
         telegram_file_id: str | None = None,
     ) -> dict:
@@ -68,11 +68,9 @@ class SurveyAnswerService:
             question.order,
         )
 
-        finished = next_question is None
-
         return {
             "success": True,
-            "finished": finished,
+            "finished": next_question is None,
             "answer": answer,
             "next_question": next_question,
         }
