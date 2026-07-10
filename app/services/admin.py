@@ -90,3 +90,40 @@ class AdminService:
         """
 
         return await self.dashboard.users_without_report_today()
+
+        async def remind_users_today(
+        self,
+        bot,
+    ) -> tuple[int, int]:
+        """
+        Send reminder to users without today's report.
+
+        Returns:
+            (success_count, failed_count)
+        """
+
+        users = await self.users_without_report_today()
+
+        success = 0
+        failed = 0
+
+        for user in users:
+
+            try:
+
+                await bot.send_message(
+                    chat_id=user.telegram_id,
+                    text=(
+                        "📢 <b>Напоминание</b>\n\n"
+                        "Пожалуйста, не забудьте пройти сегодняшний опрос 💪"
+                    ),
+                    parse_mode="HTML",
+                )
+
+                success += 1
+
+            except Exception:
+
+                failed += 1
+
+        return success, failed
