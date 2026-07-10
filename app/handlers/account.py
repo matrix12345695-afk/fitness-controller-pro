@@ -3,6 +3,7 @@ from aiogram.types import Message
 
 from app.core.database import SessionLocal
 from app.services.account import AccountService
+from app.services.registration import RegistrationService
 
 router = Router()
 
@@ -24,12 +25,28 @@ async def my_profile(
 
     async with SessionLocal() as session:
 
+        registration = RegistrationService(
+            session,
+        )
+
+        user = await registration.get_user(
+            message.from_user.id,
+        )
+
+        if user is None:
+
+            await message.answer(
+                "❌ Пользователь не найден."
+            )
+
+            return
+
         service = AccountService(
             session,
         )
 
         account = await service.get_account(
-            message.from_user.id,
+            user.id,
         )
 
         if account is None:
@@ -41,17 +58,27 @@ async def my_profile(
             return
 
         if account["gender"] == "MALE":
+
             gender = "👨 Мужской"
+
         else:
+
             gender = "👩 Женский"
 
         last_report = "Нет"
 
         if account["last_report"]:
 
-            last_report = account[
-                "last_report"
-            ].created_at.strftime(
+            last_report = (
+                account["last_report"]
+                .created_at.strftime("%d.%m.%Y")
+            )
+
+        birth_date = "-"
+
+        if account["birth_date"]:
+
+            birth_date = account["birth_date"].strftime(
                 "%d.%m.%Y"
             )
 
@@ -62,20 +89,17 @@ async def my_profile(
 
             f"{gender}\n"
 
-            f"🎂 <b>Дата рождения:</b> "
-            f"{account['birth_date']:%d.%m.%Y}\n"
+            f"🎂 <b>Дата рождения:</b> {birth_date}\n"
 
-            f"📏 <b>Рост:</b> "
-            f"{account['height']} см\n"
+            f"📏 <b>Рост:</b> {account['height']} см\n"
 
-            f"⚖️ <b>Вес:</b> "
-            f"{account['start_weight']} кг\n\n"
+            f"⚖️ <b>Вес:</b> {account['start_weight']} кг\n\n"
 
-            "━━━━━━━━━━━━━━\n"
+            "━━━━━━━━━━━━━━━━━━\n\n"
 
             "📊 <b>СТАТИСТИКА</b>\n\n"
 
-            f"✅ Опросов: {account['reports']}\n"
+            f"✅ Пройдено опросов: {account['reports']}\n"
 
             f"📅 Последний отчёт: {last_report}"
         )
