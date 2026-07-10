@@ -78,7 +78,7 @@ async def start_survey(
 
         )
 
-                question_text = survey.engine.get_question_text(
+        question_text = survey.engine.get_question_text(
             question,
             user.language.value,
         )
@@ -104,7 +104,7 @@ async def start_survey(
             question_text,
         )
 
-    @router.message(
+@router.message(
     SurveyState.waiting_answer,
     F.text,
 )
@@ -112,9 +112,9 @@ async def process_answer(
     message: Message,
     state: FSMContext,
 ):
-        """
-        Process text answer.
-        """
+    """
+    Process text answer.
+    """
 
     data = await state.get_data()
 
@@ -388,5 +388,4 @@ async def process_photo(
         await message.answer(
             question_text,
         )
-
 
