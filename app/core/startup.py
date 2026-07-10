@@ -1,5 +1,3 @@
-from sqlalchemy import text
-
 from app.core.database import engine
 from app.models.base import Base
 from app.core.bot import dp
@@ -50,6 +48,21 @@ async def check_system() -> None:
 
     logger.success("Diagnostics completed")
 
+async def create_database() -> None:
+    """
+    Create database tables.
+    """
+
+    logger.info("Creating database tables...")
+
+    async with engine.begin() as conn:
+
+        await conn.run_sync(
+            Base.metadata.create_all,
+        )
+
+    logger.success("Database ready")
+
 
 async def startup() -> None:
     """
@@ -68,17 +81,4 @@ async def startup() -> None:
 
     logger.success("Application started")
 
-async def create_database() -> None:
-    """
-    Create database tables.
-    """
 
-    logger.info("Creating database tables...")
-
-    async with engine.begin() as conn:
-
-        await conn.run_sync(
-            Base.metadata.create_all,
-        )
-
-    logger.success("Database ready")
