@@ -12,4 +12,6 @@ class SurveyState(StatesGroup):
 
     waiting_answer = State()
 
+    waiting_photo = State()
+
     completed = State()
