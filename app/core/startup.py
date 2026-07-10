@@ -1,3 +1,5 @@
+import app.models
+
 from app.core.database import engine
 from app.models.base import Base
 from app.core.bot import dp
