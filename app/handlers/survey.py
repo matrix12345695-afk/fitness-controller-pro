@@ -97,3 +97,94 @@ async def start_survey(
         await message.answer(
             question_text,
         )
+
+@router.message(
+    SurveyState.waiting_answer,
+    F.text,
+)
+async def process_answer(
+    message: Message,
+    state: FSMContext,
+):
+    """
+    Process text answer.
+    """
+
+    data = await state.get_data()
+
+    async with SessionLocal() as session:
+
+        survey = SurveyService(
+            session,
+        )
+
+        result = await survey.process_answer(
+            report_id=data["report_id"],
+            question_id=data["question_id"],
+            text=message.text,
+        )
+
+        if not result["success"]:
+
+            await message.answer(
+                result["error"],
+            )
+
+            return
+
+        if result["finished"]:
+
+            await survey.finish_survey(
+                data["report_id"],
+            )
+
+            await state.clear()
+
+            language = data.get(
+                "language",
+                "ru",
+            )
+
+            if language == "uz":
+
+                await message.answer(
+                    "✅ So'rovnoma muvaffaqiyatli yakunlandi!",
+                    reply_markup=main_menu_uz(),
+                )
+
+            else:
+
+                await message.answer(
+                    "✅ Опрос успешно завершён!",
+                    reply_markup=main_menu_ru(),
+                )
+
+            return
+
+        question = result["next_question"]
+
+        await state.update_data(
+
+            question_id=question.id,
+
+            question_order=question.order,
+
+        )
+
+        question_text = survey.engine.get_question_text(
+            question,
+            data["language"],
+        )
+
+        if question.photo_required:
+
+            question_text += (
+                "\n\n"
+                "📷 Прикрепите фотографию."
+            )
+
+        await message.answer(
+            question_text,
+        )
+
+
