@@ -48,7 +48,9 @@ class UserRepository(BaseRepository[User]):
 
         return await self.add(user)
 
-    async def get_all(self):
+    async def get_all(
+        self,
+    ):
 
         stmt = (
             select(User)
@@ -56,6 +58,19 @@ class UserRepository(BaseRepository[User]):
         )
 
         return await self.scalars(stmt)
+
+    async def count(
+        self,
+    ) -> int:
+        """
+        Count all users.
+        """
+
+        stmt = select(User)
+
+        users = await self.scalars(stmt)
+
+        return len(users)
 
     async def deactivate(
         self,
