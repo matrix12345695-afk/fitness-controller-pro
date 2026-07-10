@@ -18,6 +18,10 @@ class AdminService:
             session,
         )
 
+    # ==========================================================
+    # USERS
+    # ==========================================================
+
     async def get_users(
         self,
     ):
@@ -38,3 +42,32 @@ class AdminService:
         return await self.users.get(
             user_id,
         )
+
+    async def total_users(
+        self,
+    ) -> int:
+        """
+        Total users count.
+        """
+
+        return await self.users.count()
+
+    # ==========================================================
+    # DASHBOARD
+    # ==========================================================
+
+    async def dashboard(
+        self,
+    ) -> dict:
+        """
+        Dashboard data.
+        """
+
+        total = await self.total_users()
+
+        return {
+            "total_users": total,
+            "completed_today": 0,
+            "not_completed_today": total,
+            "completion_percent": 0,
+        }
