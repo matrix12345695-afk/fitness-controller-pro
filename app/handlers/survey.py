@@ -189,8 +189,8 @@ async def process_answer(
             question,
             data["language"],
         )
-
-                if question.photo_required:
+        
+        if question.photo_required:
 
             await state.set_state(
                 SurveyState.waiting_photo,
@@ -206,6 +206,8 @@ async def process_answer(
             await state.set_state(
                 SurveyState.waiting_answer,
             )
+
+        await message.answer(
             question_text,
         )
 
