@@ -1,6 +1,8 @@
 from aiogram.types import KeyboardButton
 from aiogram.types import ReplyKeyboardMarkup
 
+from app.core.config import settings
+
 
 def gender_keyboard_ru():
 
@@ -38,56 +40,90 @@ def gender_keyboard_uz():
     )
 
 
-def main_menu_ru():
+def main_menu_ru(
+    telegram_id: int | None = None,
+):
+
+    keyboard = [
+        [
+            KeyboardButton(
+                text="📝 Пройти опрос",
+            )
+        ],
+        [
+            KeyboardButton(
+                text="👤 Мой профиль",
+            ),
+            KeyboardButton(
+                text="📊 Статистика",
+            ),
+        ],
+    ]
+
+    if telegram_id == settings.admin_id:
+
+        keyboard.append(
+            [
+                KeyboardButton(
+                    text="👨‍💼 Админ",
+                )
+            ]
+        )
+
+    keyboard.append(
+        [
+            KeyboardButton(
+                text="ℹ️ Помощь",
+            )
+        ]
+    )
 
     return ReplyKeyboardMarkup(
-        keyboard=[
-            [
-                KeyboardButton(
-                    text="📝 Пройти опрос",
-                )
-            ],
-            [
-                KeyboardButton(
-                    text="👤 Мой профиль",
-                ),
-                KeyboardButton(
-                    text="📊 Статистика",
-                ),
-            ],
-            [
-                KeyboardButton(
-                    text="ℹ️ Помощь",
-                )
-            ],
-        ],
+        keyboard=keyboard,
         resize_keyboard=True,
     )
 
 
-def main_menu_uz():
+def main_menu_uz(
+    telegram_id: int | None = None,
+):
+
+    keyboard = [
+        [
+            KeyboardButton(
+                text="📝 So'rovnomani boshlash",
+            )
+        ],
+        [
+            KeyboardButton(
+                text="👤 Profil",
+            ),
+            KeyboardButton(
+                text="📊 Statistika",
+            ),
+        ],
+    ]
+
+    if telegram_id == settings.admin_id:
+
+        keyboard.append(
+            [
+                KeyboardButton(
+                    text="👨‍💼 Admin",
+                )
+            ]
+        )
+
+    keyboard.append(
+        [
+            KeyboardButton(
+                text="ℹ️ Yordam",
+            )
+        ]
+    )
 
     return ReplyKeyboardMarkup(
-        keyboard=[
-            [
-                KeyboardButton(
-                    text="📝 So'rovnomani boshlash",
-                )
-            ],
-            [
-                KeyboardButton(
-                    text="👤 Profil",
-                ),
-                KeyboardButton(
-                    text="📊 Statistika",
-                ),
-            ],
-            [
-                KeyboardButton(
-                    text="ℹ️ Yordam",
-                )
-            ],
-        ],
+        keyboard=keyboard,
         resize_keyboard=True,
     )
 
@@ -99,22 +135,30 @@ def admin_menu():
             [
                 KeyboardButton(
                     text="👥 Пользователи",
-                )
+                ),
+                KeyboardButton(
+                    text="📊 Сегодня",
+                ),
             ],
             [
-                KeyboardButton(
-                    text="📊 Отчёты",
-                ),
                 KeyboardButton(
                     text="📈 Статистика",
                 ),
+                KeyboardButton(
+                    text="📷 Фотографии",
+                ),
             ],
             [
                 KeyboardButton(
-                    text="📤 Excel",
+                    text="📥 Excel",
                 ),
                 KeyboardButton(
                     text="⚙️ Настройки",
+                ),
+            ],
+            [
+                KeyboardButton(
+                    text="⬅️ Назад",
                 ),
             ],
         ],
