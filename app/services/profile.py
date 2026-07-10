@@ -1,5 +1,5 @@
 from app.models.profile import Profile
-from app.repositories.profile import ProfileRepository
+from app.repositories.profiles import ProfileRepository
 
 
 class ProfileService:
