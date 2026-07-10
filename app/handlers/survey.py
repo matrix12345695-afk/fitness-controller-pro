@@ -89,8 +89,8 @@ async def start_survey(
 
         if question.photo_required:
 
-        await state.set_state(
-            SurveyState.waiting_photo,
+            await state.set_state(
+                SurveyState.waiting_photo,
         )
 
         question_text += (
