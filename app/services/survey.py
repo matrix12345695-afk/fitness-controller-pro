@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.repositories.questions import QuestionRepository
 from app.services.base import BaseService
 from app.services.question_engine import QuestionEngine
 from app.services.survey_answer import SurveyAnswerService
@@ -11,7 +12,7 @@ class SurveyService(BaseService):
     """
     Main Survey Service.
 
-    Acts as facade for the whole survey process.
+    Facade for the whole survey process.
     """
 
     def __init__(
@@ -20,20 +21,26 @@ class SurveyService(BaseService):
     ):
         super().__init__(session)
 
-        self.engine = QuestionEngine(session)
+        question_repository = QuestionRepository(
+            session,
+        )
+
+        self.engine = QuestionEngine(
+            question_repository,
+        )
 
         self.start = SurveyStartService(
-            session,
-            self.engine,
+            session=session,
+            engine=self.engine,
         )
 
         self.answer = SurveyAnswerService(
-            session,
-            self.engine,
+            session=session,
+            engine=self.engine,
         )
 
         self.finish = SurveyFinishService(
-            session,
+            session=session,
         )
 
     async def start_survey(
@@ -53,17 +60,17 @@ class SurveyService(BaseService):
     async def process_answer(
         self,
         report_id: int,
-        question_id: int,
+        question,
         text: str | None = None,
         telegram_file_id: str | None = None,
     ):
         """
-        Save answer and move to next question.
+        Process survey answer.
         """
 
         return await self.answer.execute(
             report_id=report_id,
-            question_id=question_id,
+            question=question,
             text=text,
             telegram_file_id=telegram_file_id,
         )
@@ -73,7 +80,7 @@ class SurveyService(BaseService):
         report_id: int,
     ):
         """
-        Complete report.
+        Finish survey.
         """
 
         return await self.finish.execute(
