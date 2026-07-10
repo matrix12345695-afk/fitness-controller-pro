@@ -6,8 +6,10 @@ services:
 
     plan: free
 
-    buildCommand: pip install -r requirements.txt
-
-    startCommand: python run.py
-
     autoDeploy: true
+
+    buildCommand: |
+      pip install -r requirements.txt
+
+    startCommand: |
+      python run.py
