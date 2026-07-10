@@ -40,12 +40,27 @@ dp = Dispatcher(
 # ==========================================================
 
 async def on_startup() -> None:
+    """
+    Startup hook.
+    """
+
     logger.info("========================================")
     logger.info(" Fitness Controller PRO")
-    logger.info(" Version: 0.1.0")
+    logger.info(" Version: 1.0.0")
     logger.info("========================================")
-    logger.info("Bot initialized")
-    logger.info("Dispatcher initialized")
+
+    await bot.delete_webhook(
+        drop_pending_updates=True,
+    )
+
+    await bot.set_webhook(
+        url=f"{settings.webhook_url}{settings.webhook_path}",
+        secret_token=settings.webhook_secret,
+        drop_pending_updates=True,
+    )
+
+    logger.success("Webhook installed")
+    logger.success("Bot initialized")
 
 
 # ==========================================================
@@ -53,8 +68,15 @@ async def on_startup() -> None:
 # ==========================================================
 
 async def on_shutdown() -> None:
+    """
+    Shutdown hook.
+    """
+
     logger.info("Stopping bot...")
+
+    await bot.delete_webhook()
 
     await bot.session.close()
 
-    logger.info("Bot stopped")
+    logger.success("Webhook removed")
+    logger.success("Bot stopped")
