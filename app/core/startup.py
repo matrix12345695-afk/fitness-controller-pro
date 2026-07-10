@@ -49,6 +49,7 @@ async def register_handlers() -> None:
     dp.include_router(language_router)
     dp.include_router(profile_router)
     dp.include_router(account_router)
+    dp.include_router(admin_router)
     dp.include_router(survey_router)
 
     logger.success("Routers registered")
