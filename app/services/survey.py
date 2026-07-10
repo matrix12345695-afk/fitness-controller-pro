@@ -47,7 +47,7 @@ class SurveyService(BaseService):
         self,
         user_id: int,
         language: str,
-    ):
+    ) -> dict:
         """
         Start today's survey.
         """
@@ -58,31 +58,25 @@ class SurveyService(BaseService):
         )
 
     async def process_answer(
-    self,
-    report_id: int,
-    question_id: int,
-    text: str | None = None,
-    telegram_file_id: str | None = None,
-):
-    question = await self.engine.get_question(
-        question_id,
-    )
-
-    if question is None:
-        return {
-            "success": False,
-            "error": "Question not found.",
-        }
-
-    return await self.answer.execute(
-        report_id=report_id,
-        question=question,
-        text=text,
-        telegram_file_id=telegram_file_id,
-    )
+        self,
+        report_id: int,
+        question_id: int,
+        text: str | None = None,
+        telegram_file_id: str | None = None,
+    ) -> dict:
         """
         Process survey answer.
         """
+
+        question = await self.engine.get_question(
+            question_id,
+        )
+
+        if question is None:
+            return {
+                "success": False,
+                "error": "Question not found.",
+            }
 
         return await self.answer.execute(
             report_id=report_id,
@@ -94,7 +88,7 @@ class SurveyService(BaseService):
     async def finish_survey(
         self,
         report_id: int,
-    ):
+    ) -> dict:
         """
         Finish survey.
         """
