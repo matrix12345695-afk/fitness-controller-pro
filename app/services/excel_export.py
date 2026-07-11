@@ -210,11 +210,11 @@ class ExcelExportService:
     # ANSWERS
     # =====================================================
 
-def _fill_answers(
-    self,
-    ws,
-    rows,
-):
+    def _fill_answers(
+        self,
+        ws,
+        rows,
+    ):
     """
     Fill worksheet with answers.
     """
