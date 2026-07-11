@@ -2,7 +2,9 @@ from datetime import date
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+from app.models.answer import Answer
 from app.models.photo import Photo
 from app.models.profile import Profile
 from app.models.report import Report
@@ -20,10 +22,17 @@ class ReportGeneratorService:
     ):
         self.session = session
 
+    # ==========================================================
+    # DASHBOARD
+    # ==========================================================
+
     async def dashboard(
         self,
         report_date: date | None = None,
     ) -> dict:
+        """
+        Dashboard statistics.
+        """
 
         if report_date is None:
             report_date = date.today()
@@ -79,3 +88,70 @@ class ReportGeneratorService:
                 1,
             ),
         }
+
+    # ==========================================================
+    # ANSWERS
+    # ==========================================================
+
+    async def answers(
+        self,
+        report_date: date | None = None,
+    ) -> list[dict]:
+        """
+        Export answers for selected date.
+        """
+
+        if report_date is None:
+            report_date = date.today()
+
+        stmt = (
+            select(Report)
+            .where(
+                Report.report_date == report_date
+            )
+            .options(
+                selectinload(
+                    Report.user
+                ),
+                selectinload(
+                    Report.answers
+                ).selectinload(
+                    Answer.question
+                ),
+                selectinload(
+                    Report.answers
+                ).selectinload(
+                    Answer.photos
+                ),
+            )
+        )
+
+        reports = (
+            await self.session.execute(stmt)
+        ).scalars().all()
+
+        rows = []
+
+        for report in reports:
+
+            user = report.user
+
+            full_name = (
+                f"{user.first_name} {user.last_name or ''}"
+            ).strip()
+
+            for answer in report.answers:
+
+                rows.append(
+                    {
+                        "user": full_name,
+                        "date": report.report_date.strftime(
+                            "%d.%m.%Y"
+                        ),
+                        "question": answer.question.text_ru,
+                        "answer": answer.answer,
+                        "photos": len(answer.photos),
+                    }
+                )
+
+        return rows
