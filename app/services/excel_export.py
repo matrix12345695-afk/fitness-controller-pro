@@ -215,9 +215,9 @@ class ExcelExportService:
         ws,
         rows,
     ):
-    """
-    Fill worksheet with answers.
-    """
+        """
+        Fill worksheet with answers.
+        """
 
     headers = [
         "Пользователь",
