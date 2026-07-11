@@ -84,14 +84,16 @@ class AdminService:
 
         return await self.dashboard.users_today()
 
-    async def users_without_report_today(self):
+    async def users_without_report_today(
+        self,
+    ):
         """
         Users without today's report.
         """
 
         return await self.dashboard.users_without_report_today()
 
-        async def remind_users_today(
+    async def remind_users_today(
         self,
         bot,
     ) -> tuple[int, int]:
@@ -123,7 +125,6 @@ class AdminService:
                 success += 1
 
             except Exception:
-
                 failed += 1
 
         return success, failed
