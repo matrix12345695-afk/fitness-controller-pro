@@ -210,7 +210,7 @@ class ExcelExportService:
     # ANSWERS
     # =====================================================
 
-    def _fill_answers(
+        def _fill_answers(
         self,
         ws,
         rows,
@@ -219,121 +219,116 @@ class ExcelExportService:
         Fill worksheet with answers.
         """
 
-    headers = [
-        "Пользователь",
-        "Дата",
-        "Вопрос",
-        "Ответ",
-        "Фото",
-        "Есть фото",
-    ]
+        headers = [
+            "Пользователь",
+            "Дата",
+            "Вопрос",
+            "Ответ",
+            "Фото",
+            "Есть фото",
+        ]
 
-    header_fill = PatternFill(
-        fill_type="solid",
-        fgColor="305496",
-    )
-
-    header_font = Font(
-        bold=True,
-        color="FFFFFF",
-    )
-
-    yes_fill = PatternFill(
-        fill_type="solid",
-        fgColor="C6EFCE",
-    )
-
-    no_fill = PatternFill(
-        fill_type="solid",
-        fgColor="FFC7CE",
-    )
-
-    for col, title in enumerate(
-        headers,
-        start=1,
-    ):
-
-        cell = ws.cell(
-            row=1,
-            column=col,
-            value=title,
+        header_fill = PatternFill(
+            fill_type="solid",
+            fgColor="305496",
         )
 
-        cell.fill = header_fill
-        cell.font = header_font
-        cell.alignment = Alignment(
-            horizontal="center",
-            vertical="center",
+        header_font = Font(
+            bold=True,
+            color="FFFFFF",
         )
 
-    row = 2
-
-    for item in rows:
-
-        ws.cell(
-            row=row,
-            column=1,
-            value=item["user"],
+        yes_fill = PatternFill(
+            fill_type="solid",
+            fgColor="C6EFCE",
         )
 
-        ws.cell(
-            row=row,
-            column=2,
-            value=item["date"],
+        no_fill = PatternFill(
+            fill_type="solid",
+            fgColor="FFC7CE",
         )
 
-        ws.cell(
-            row=row,
-            column=3,
-            value=item["question"],
-        )
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
 
-        ws.cell(
-            row=row,
-            column=4,
-            value=item["answer"],
-        )
+            cell = ws.cell(
+                row=1,
+                column=col,
+                value=title,
+            )
 
-        ws.cell(
-            row=row,
-            column=5,
-            value=item["photos"],
-        )
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(
+                horizontal="center",
+                vertical="center",
+            )
 
-        photo_cell = ws.cell(
-            row=row,
-            column=6,
-        )
+        row = 2
 
-        if item["photos"] > 0:
+        for item in rows:
 
-            photo_cell.value = "✅"
+            ws.cell(
+                row=row,
+                column=1,
+                value=item["user"],
+            )
 
-            photo_cell.fill = yes_fill
+            ws.cell(
+                row=row,
+                column=2,
+                value=item["date"],
+            )
 
-        else:
+            ws.cell(
+                row=row,
+                column=3,
+                value=item["question"],
+            )
 
-            photo_cell.value = "❌"
+            ws.cell(
+                row=row,
+                column=4,
+                value=item["answer"],
+            )
 
-            photo_cell.fill = no_fill
+            ws.cell(
+                row=row,
+                column=5,
+                value=item["photos"],
+            )
 
-        row += 1
+            photo_cell = ws.cell(
+                row=row,
+                column=6,
+            )
 
-    ws.freeze_panes = "A2"
+            if item["photos"] > 0:
 
-    ws.auto_filter.ref = ws.dimensions
+                photo_cell.value = "✅"
+                photo_cell.fill = yes_fill
 
-    widths = {
-        "A": 28,
-        "B": 15,
-        "C": 40,
-        "D": 45,
-        "E": 10,
-        "F": 12,
-    }
+            else:
 
-    for column, width in widths.items():
+                photo_cell.value = "❌"
+                photo_cell.fill = no_fill
 
-        ws.column_dimensions[
-            column
-        ].width = width
+            row += 1
+
+        ws.freeze_panes = "A2"
+        ws.auto_filter.ref = ws.dimensions
+
+        widths = {
+            "A": 28,
+            "B": 15,
+            "C": 40,
+            "D": 45,
+            "E": 10,
+            "F": 12,
+        }
+
+        for column, width in widths.items():
+
+            ws.column_dimensions[column].width = width
