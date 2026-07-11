@@ -155,3 +155,65 @@ class ReportGeneratorService:
                 )
 
         return rows
+
+    async def photos(
+        self,
+        report_date: date | None = None,
+    ) -> list[dict]:
+        """
+        Export photos for selected date.
+        """
+
+        if report_date is None:
+            report_date = date.today()
+
+        stmt = (
+            select(Report)
+            .where(
+                Report.report_date == report_date
+            )
+            .options(
+                selectinload(
+                    Report.user
+                ),
+                selectinload(
+                    Report.answers
+                )
+                .selectinload(
+                    Answer.question
+                ),
+                selectinload(
+                    Report.answers
+                )
+                .selectinload(
+                    Answer.photos
+                ),
+            )
+        )
+
+        reports = (
+            await self.session.execute(stmt)
+        ).scalars().all()
+
+        rows = []
+
+        for report in reports:
+
+            full_name = (
+                f"{report.user.first_name} "
+                f"{report.user.last_name or ''}"
+            ).strip()
+
+            for answer in report.answers:
+
+                for photo in answer.photos:
+
+                    rows.append(
+                        {
+                            "user": full_name,
+                            "question": answer.question.text_ru,
+                            "telegram_file_id": photo.telegram_file_id,
+                        }
+                    )
+
+        return rows
