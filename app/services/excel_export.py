@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -9,40 +9,80 @@ from openpyxl.styles import (
     PatternFill,
     Side,
 )
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.services.report_generator import ReportGeneratorService
 
 
 class ExcelExportService:
     """
-    Fitness Controller PRO Excel Export
+    Excel report generator.
     """
 
-    def __init__(self):
+    def __init__(
+        self,
+        session: AsyncSession,
+    ):
+        self.session = session
 
-        self.output_dir = Path("exports/reports")
+        self.generator = ReportGeneratorService(
+            session,
+        )
+
+        self.output_dir = Path(
+            "exports/reports"
+        )
+
         self.output_dir.mkdir(
             parents=True,
             exist_ok=True,
         )
 
-    def create_report(self):
+    async def create_report(
+        self,
+        report_date: date | None = None,
+    ) -> Path:
+        """
+        Create Excel report.
+        """
+
+        if report_date is None:
+            report_date = date.today()
 
         workbook = Workbook()
 
         dashboard = workbook.active
         dashboard.title = "Dashboard"
 
-        self._create_dashboard_sheet(
-            dashboard,
+        answers_sheet = workbook.create_sheet(
+            "Ответы"
         )
 
-        workbook.create_sheet("Ответы")
         workbook.create_sheet("Питание")
         workbook.create_sheet("Тренировки")
         workbook.create_sheet("Фото")
         workbook.create_sheet("Статистика")
 
+        dashboard_data = await self.generator.dashboard(
+            report_date,
+        )
+
+        answers = await self.generator.answers(
+            report_date,
+        )
+
+        self._fill_dashboard(
+            dashboard,
+            dashboard_data,
+        )
+
+        self._fill_answers(
+            answers_sheet,
+            answers,
+        )
+
         filename = (
-            f"report_{datetime.now():%Y-%m-%d_%H-%M-%S}.xlsx"
+            f"report_{report_date}.xlsx"
         )
 
         filepath = self.output_dir / filename
@@ -51,9 +91,14 @@ class ExcelExportService:
 
         return filepath
 
-    def _create_dashboard_sheet(
+    # =====================================================
+    # DASHBOARD
+    # =====================================================
+
+    def _fill_dashboard(
         self,
         ws,
+        data,
     ):
 
         blue = PatternFill(
@@ -61,7 +106,7 @@ class ExcelExportService:
             fgColor="305496",
         )
 
-        white_font = Font(
+        white = Font(
             color="FFFFFF",
             bold=True,
             size=18,
@@ -90,7 +135,7 @@ class ExcelExportService:
 
         cell.fill = blue
 
-        cell.font = white_font
+        cell.font = white
 
         cell.alignment = Alignment(
             horizontal="center",
@@ -99,17 +144,35 @@ class ExcelExportService:
 
         ws["A4"] = "Дата"
 
-        ws["B4"] = datetime.now().strftime(
+        ws["B4"] = data["date"].strftime(
             "%d.%m.%Y"
         )
 
         rows = [
-            ("👥 Пользователей", ""),
-            ("✅ Прошли", ""),
-            ("❌ Не прошли", ""),
-            ("📈 Выполнение", ""),
-            ("📷 Фото", ""),
-            ("⚖ Средний вес", ""),
+            (
+                "👥 Пользователей",
+                data["total_users"],
+            ),
+            (
+                "✅ Прошли",
+                data["completed"],
+            ),
+            (
+                "❌ Не прошли",
+                data["not_completed"],
+            ),
+            (
+                "📈 Выполнение",
+                f"{data['percent']}%",
+            ),
+            (
+                "📷 Фото",
+                data["photos"],
+            ),
+            (
+                "⚖ Средний вес",
+                f"{data['average_weight']} кг",
+            ),
         ]
 
         row = 6
@@ -120,18 +183,13 @@ class ExcelExportService:
                 row=row,
                 column=1,
                 value=title,
-            )
+            ).font = bold
 
             ws.cell(
                 row=row,
                 column=2,
                 value=value,
             )
-
-            ws.cell(
-                row=row,
-                column=1,
-            ).font = bold
 
             ws.cell(
                 row=row,
@@ -145,7 +203,102 @@ class ExcelExportService:
 
             row += 1
 
-        ws.column_dimensions["A"].width = 32
-        ws.column_dimensions["B"].width = 18
-        ws.column_dimensions["C"].width = 18
-        ws.column_dimensions["D"].width = 18
+        ws.column_dimensions["A"].width = 30
+        ws.column_dimensions["B"].width = 20
+
+    # =====================================================
+    # ANSWERS
+    # =====================================================
+
+    def _fill_answers(
+        self,
+        ws,
+        rows,
+    ):
+
+        headers = [
+            "Пользователь",
+            "Дата",
+            "Вопрос",
+            "Ответ",
+            "Фото",
+        ]
+
+        fill = PatternFill(
+            "solid",
+            fgColor="305496",
+        )
+
+        font = Font(
+            bold=True,
+            color="FFFFFF",
+        )
+
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
+
+            cell = ws.cell(
+                row=1,
+                column=col,
+                value=title,
+            )
+
+            cell.fill = fill
+
+            cell.font = font
+
+        row_index = 2
+
+        for item in rows:
+
+            ws.cell(
+                row=row_index,
+                column=1,
+                value=item["user"],
+            )
+
+            ws.cell(
+                row=row_index,
+                column=2,
+                value=item["date"],
+            )
+
+            ws.cell(
+                row=row_index,
+                column=3,
+                value=item["question"],
+            )
+
+            ws.cell(
+                row=row_index,
+                column=4,
+                value=item["answer"],
+            )
+
+            ws.cell(
+                row=row_index,
+                column=5,
+                value=item["photos"],
+            )
+
+            row_index += 1
+
+        ws.freeze_panes = "A2"
+
+        ws.auto_filter.ref = ws.dimensions
+
+        widths = {
+            "A": 28,
+            "B": 14,
+            "C": 45,
+            "D": 45,
+            "E": 10,
+        }
+
+        for column, width in widths.items():
+
+            ws.column_dimensions[
+                column
+            ].width = width
