@@ -15,6 +15,10 @@ from app.services.admin import AdminService
 from app.keyboards.dashboard import dashboard_keyboard
 from app.keyboards.remind import remind_confirm_keyboard
 from app.core.bot import bot
+from app.keyboards.excel import excel_keyboard
+
+from aiogram.types import FSInputFile
+from app.services.excel_export import ExcelExportService
 
 router = Router()
 
@@ -378,3 +382,61 @@ async def remind_cancel(
     )
 
     await callback.answer()
+
+@router.callback_query(
+    F.data == "dashboard_excel",
+)
+async def dashboard_excel(
+    callback: CallbackQuery,
+):
+    """
+    Excel export menu.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+        await callback.answer()
+        return
+
+    await callback.message.edit_text(
+        (
+            "📥 <b>Экспорт Excel</b>\n\n"
+            "Выберите период формирования отчёта."
+        ),
+        parse_mode="HTML",
+        reply_markup=excel_keyboard(),
+    )
+
+    await callback.answer()
+
+@router.callback_query(
+    F.data == "excel_today",
+)
+async def excel_today(
+    callback: CallbackQuery,
+):
+    """
+    Generate Excel for today.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+        await callback.answer()
+        return
+
+    await callback.answer(
+        "⏳ Формирование Excel..."
+    )
+
+    async with SessionLocal() as session:
+
+        exporter = ExcelExportService(
+            session,
+        )
+
+        filepath = await exporter.create_report()
+
+    document = FSInputFile(filepath)
+
+    await callback.message.answer_document(
+        document=document,
+        caption="📥 Отчёт сформирован автоматически.",
+    )
