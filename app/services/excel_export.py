@@ -210,95 +210,130 @@ class ExcelExportService:
     # ANSWERS
     # =====================================================
 
-    def _fill_answers(
-        self,
-        ws,
-        rows,
+def _fill_answers(
+    self,
+    ws,
+    rows,
+):
+    """
+    Fill worksheet with answers.
+    """
+
+    headers = [
+        "Пользователь",
+        "Дата",
+        "Вопрос",
+        "Ответ",
+        "Фото",
+        "Есть фото",
+    ]
+
+    header_fill = PatternFill(
+        fill_type="solid",
+        fgColor="305496",
+    )
+
+    header_font = Font(
+        bold=True,
+        color="FFFFFF",
+    )
+
+    yes_fill = PatternFill(
+        fill_type="solid",
+        fgColor="C6EFCE",
+    )
+
+    no_fill = PatternFill(
+        fill_type="solid",
+        fgColor="FFC7CE",
+    )
+
+    for col, title in enumerate(
+        headers,
+        start=1,
     ):
 
-        headers = [
-            "Пользователь",
-            "Дата",
-            "Вопрос",
-            "Ответ",
-            "Фото",
-        ]
-
-        fill = PatternFill(
-            "solid",
-            fgColor="305496",
+        cell = ws.cell(
+            row=1,
+            column=col,
+            value=title,
         )
 
-        font = Font(
-            bold=True,
-            color="FFFFFF",
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(
+            horizontal="center",
+            vertical="center",
         )
 
-        for col, title in enumerate(
-            headers,
-            start=1,
-        ):
+    row = 2
 
-            cell = ws.cell(
-                row=1,
-                column=col,
-                value=title,
-            )
+    for item in rows:
 
-            cell.fill = fill
+        ws.cell(
+            row=row,
+            column=1,
+            value=item["user"],
+        )
 
-            cell.font = font
+        ws.cell(
+            row=row,
+            column=2,
+            value=item["date"],
+        )
 
-        row_index = 2
+        ws.cell(
+            row=row,
+            column=3,
+            value=item["question"],
+        )
 
-        for item in rows:
+        ws.cell(
+            row=row,
+            column=4,
+            value=item["answer"],
+        )
 
-            ws.cell(
-                row=row_index,
-                column=1,
-                value=item["user"],
-            )
+        ws.cell(
+            row=row,
+            column=5,
+            value=item["photos"],
+        )
 
-            ws.cell(
-                row=row_index,
-                column=2,
-                value=item["date"],
-            )
+        photo_cell = ws.cell(
+            row=row,
+            column=6,
+        )
 
-            ws.cell(
-                row=row_index,
-                column=3,
-                value=item["question"],
-            )
+        if item["photos"] > 0:
 
-            ws.cell(
-                row=row_index,
-                column=4,
-                value=item["answer"],
-            )
+            photo_cell.value = "✅"
 
-            ws.cell(
-                row=row_index,
-                column=5,
-                value=item["photos"],
-            )
+            photo_cell.fill = yes_fill
 
-            row_index += 1
+        else:
 
-        ws.freeze_panes = "A2"
+            photo_cell.value = "❌"
 
-        ws.auto_filter.ref = ws.dimensions
+            photo_cell.fill = no_fill
 
-        widths = {
-            "A": 28,
-            "B": 14,
-            "C": 45,
-            "D": 45,
-            "E": 10,
-        }
+        row += 1
 
-        for column, width in widths.items():
+    ws.freeze_panes = "A2"
 
-            ws.column_dimensions[
-                column
-            ].width = width
+    ws.auto_filter.ref = ws.dimensions
+
+    widths = {
+        "A": 28,
+        "B": 15,
+        "C": 40,
+        "D": 45,
+        "E": 10,
+        "F": 12,
+    }
+
+    for column, width in widths.items():
+
+        ws.column_dimensions[
+            column
+        ].width = width
