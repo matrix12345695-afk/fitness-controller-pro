@@ -20,6 +20,10 @@ from app.keyboards.excel import excel_keyboard
 from aiogram.types import FSInputFile
 from app.services.excel_export import ExcelExportService
 
+from loguru import logger
+
+from pathlib import Path
+
 router = Router()
 
 
@@ -422,8 +426,8 @@ async def excel_today(
         await callback.answer()
         return
 
-    await callback.answer(
-        "⏳ Формирование Excel..."
+    status = await callback.message.edit_text(
+        "⏳ Формирую Excel...\n\nПожалуйста, подождите."
     )
 
     async with SessionLocal() as session:
@@ -432,11 +436,45 @@ async def excel_today(
             session,
         )
 
-        filepath = await exporter.create_report()
+        try:
+
+            filepath = await exporter.create_report()
+
+            logger.info(
+                "Excel report generated: {}",
+                filepath,
+            )
+
+        except Exception as e:
+
+            logger.exception(e)
+
+            await status.edit_text(
+                f"❌ Ошибка формирования Excel.\n\n<code>{e}</code>",
+                parse_mode="HTML",
+            )
+
+            return
+
+    await status.edit_text(
+        "✅ Excel успешно сформирован."
+    )
 
     document = FSInputFile(filepath)
 
     await callback.message.answer_document(
         document=document,
         caption="📥 Отчёт сформирован автоматически.",
+    )
+
+    try:
+        Path(filepath).unlink(
+            missing_ok=True,
+        )
+    except Exception:
+        logger.exception("Cannot delete %s", filepath)
+
+    await callback.message.answer(
+        "👨‍💼 Панель администратора",
+        reply_markup=admin_menu(),
     )
