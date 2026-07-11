@@ -210,7 +210,7 @@ class ExcelExportService:
     # ANSWERS
     # =====================================================
 
-        def _fill_answers(
+    def _fill_answers(
         self,
         ws,
         rows,
