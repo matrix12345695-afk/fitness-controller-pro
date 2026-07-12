@@ -655,10 +655,10 @@ class ExcelExportService:
     # =====================================================
 
     def _fill_photos(
-    self,
-    ws,
-    photos,
-):
+        self,
+        ws,
+        photos,
+    ):
     """
     Prepare photo worksheet.
 
