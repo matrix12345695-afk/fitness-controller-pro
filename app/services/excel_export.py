@@ -118,7 +118,7 @@ class ExcelExportService:
         )
 
         # Photos
-        self._fill_photos(
+        await self._insert_photos(
             photos_ws,
             photos,
         )
@@ -150,6 +150,8 @@ class ExcelExportService:
         workbook.save(
             filepath,
         )
+
+        self.photo_export.cleanup()
 
         return filepath
 
@@ -720,6 +722,91 @@ class ExcelExportService:
 
     ws.freeze_panes = "A2"
     ws.auto_filter.ref = ws.dimensions
+    
+    # =====================================================
+    # INSERT PHOTOS
+    # =====================================================
+
+    async def _insert_photos(
+        self,
+        ws,
+        photos,
+    ):
+        """
+        Download and insert Telegram photos into Excel.
+        """
+
+        row = 2
+
+        for item in photos:
+
+            ws.cell(
+                row=row,
+                column=1,
+                value=item["user"],
+            )
+
+            ws.cell(
+                row=row,
+                column=2,
+                value=item["date"],
+            )
+
+            ws.cell(
+                row=row,
+                column=3,
+                value=item["question"],
+            )
+
+            file_id = item.get(
+                "telegram_file_id",
+            )
+
+            if file_id:
+
+                try:
+
+                    image_path = await self.photo_export.download(
+                        file_id,
+                    )
+
+                    image = Image(
+                        image_path,
+                    )
+
+                    image.width = 120
+                    image.height = 120
+
+                    ws.add_image(
+                        image,
+                        f"D{row}",
+                    )
+
+                    ws.row_dimensions[row].height = 95
+
+                except Exception:
+
+                    ws.cell(
+                        row=row,
+                        column=4,
+                        value="Ошибка загрузки",
+                    )
+
+            else:
+
+                ws.cell(
+                    row=row,
+                    column=4,
+                    value="Нет фото",
+                )
+
+            row += 1
+
+        ws.column_dimensions["D"].width = 25
+
+        ws.freeze_panes = "A2"
+
+        ws.auto_filter.ref = ws.dimensions
 
     # =====================================================
     # SAVE
