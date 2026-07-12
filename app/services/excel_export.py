@@ -661,11 +661,11 @@ class ExcelExportService:
         ws,
         photos,
     ):
-    """
-    Prepare photo worksheet.
+        """
+        Prepare photo worksheet.
 
-    Images are inserted later.
-    """
+        Images are inserted later.
+        """
 
     headers = [
         "Пользователь",
