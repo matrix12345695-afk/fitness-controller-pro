@@ -656,7 +656,7 @@ class ExcelExportService:
     # PHOTOS
     # =====================================================
 
-    def _fill_photos(
+        def _fill_photos(
         self,
         ws,
         photos,
@@ -667,17 +667,17 @@ class ExcelExportService:
         Images are inserted later.
         """
 
-    headers = [
-        "Пользователь",
-        "Дата",
-        "Вопрос",
-        "Фото",
-    ]
+        headers = [
+            "Пользователь",
+            "Дата",
+            "Вопрос",
+            "Фото",
+        ]
 
-    for col, title in enumerate(
-        headers,
-        start=1,
-    ):
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
 
         cell = ws.cell(
             row=1,
@@ -690,7 +690,7 @@ class ExcelExportService:
         cell.alignment = ExcelStyle.CENTER
         cell.border = ExcelStyle.BORDER
 
-    row = 2
+        row = 2
 
     for item in photos:
 
