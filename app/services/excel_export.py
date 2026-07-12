@@ -354,31 +354,46 @@ class ExcelExportService:
             ws.cell(
                 row=row,
                 column=1,
-                value=item["user"],
+                value=item.get(
+                    "user",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=2,
-                value=item["date"],
+                value=item.get(
+                    "date",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=3,
-                value=item["question"],
+                value=item.get(
+                    "question",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=4,
-                value=item["answer"],
+                value=item.get(
+                    "answer",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=5,
-                value=item["photos"],
+                value=item.get(
+                    "photos",
+                    0,
+                ),
             )
 
             status = ws.cell(
@@ -386,16 +401,17 @@ class ExcelExportService:
                 column=6,
             )
 
-            if item["photos"] > 0:
+            if item.get(
+                "photos",
+                0,
+            ) > 0:
 
                 status.value = "✅ Есть"
-
                 status.fill = ExcelStyle.SUCCESS_FILL
 
             else:
 
                 status.value = "❌ Нет"
-
                 status.fill = ExcelStyle.ERROR_FILL
 
             for col in range(
@@ -411,13 +427,11 @@ class ExcelExportService:
                 current.border = ExcelStyle.BORDER
 
                 if col != 6:
-
                     current.alignment = ExcelStyle.LEFT
 
             row += 1
 
         ws.freeze_panes = "A2"
-
         ws.auto_filter.ref = ws.dimensions
 
         widths = {
@@ -456,7 +470,10 @@ class ExcelExportService:
             "Фото",
         ]
 
-        for col, title in enumerate(headers, start=1):
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
 
             cell = ws.cell(
                 row=1,
@@ -482,7 +499,12 @@ class ExcelExportService:
 
         for item in rows:
 
-            question = item["question"].lower()
+            question = str(
+                item.get(
+                    "question",
+                    "",
+                )
+            ).lower()
 
             if not any(
                 key in question
@@ -490,16 +512,69 @@ class ExcelExportService:
             ):
                 continue
 
-            ws.cell(row=row, column=1).value = item["user"]
-            ws.cell(row=row, column=2).value = item["date"]
-            ws.cell(row=row, column=3).value = item["question"]
-            ws.cell(row=row, column=4).value = item["answer"]
-            ws.cell(row=row, column=5).value = item["photos"]
+            ws.cell(
+                row=row,
+                column=1,
+                value=item.get(
+                    "user",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=2,
+                value=item.get(
+                    "date",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=3,
+                value=item.get(
+                    "question",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=4,
+                value=item.get(
+                    "answer",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=5,
+                value=item.get(
+                    "photos",
+                    0,
+                ),
+            )
 
             row += 1
 
         ws.freeze_panes = "A2"
         ws.auto_filter.ref = ws.dimensions
+
+        widths = {
+            "A": 28,
+            "B": 15,
+            "C": 35,
+            "D": 45,
+            "E": 10,
+        }
+
+        for column, width in widths.items():
+
+            ws.column_dimensions[
+                column
+            ].width = width
 
     # =====================================================
     # TRAINING
@@ -521,7 +596,10 @@ class ExcelExportService:
             "Ответ",
         ]
 
-        for col, title in enumerate(headers, start=1):
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
 
             cell = ws.cell(
                 row=1,
@@ -544,11 +622,18 @@ class ExcelExportService:
             "машк",
             "сув",
             "ухлаш",
+            "ходьба",
+            "walking",
         )
 
         for item in rows:
 
-            question = item["question"].lower()
+            question = str(
+                item.get(
+                    "question",
+                    "",
+                )
+            ).lower()
 
             if not any(
                 key in question
@@ -556,16 +641,59 @@ class ExcelExportService:
             ):
                 continue
 
-            ws.cell(row=row, column=1).value = item["user"]
-            ws.cell(row=row, column=2).value = item["date"]
-            ws.cell(row=row, column=3).value = item["question"]
-            ws.cell(row=row, column=4).value = item["answer"]
+            ws.cell(
+                row=row,
+                column=1,
+                value=item.get(
+                    "user",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=2,
+                value=item.get(
+                    "date",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=3,
+                value=item.get(
+                    "question",
+                    "",
+                ),
+            )
+
+            ws.cell(
+                row=row,
+                column=4,
+                value=item.get(
+                    "answer",
+                    "",
+                ),
+            )
 
             row += 1
 
         ws.freeze_panes = "A2"
         ws.auto_filter.ref = ws.dimensions
 
+        widths = {
+            "A": 28,
+            "B": 15,
+            "C": 35,
+            "D": 45,
+        }
+
+        for column, width in widths.items():
+
+            ws.column_dimensions[
+                column
+            ].width = width
     # =====================================================
     # STATISTICS
     # =====================================================
@@ -663,8 +791,32 @@ class ExcelExportService:
         photos,
     ):
         """
-        Download and insert Telegram photos into Excel.
+        Download Telegram photos and insert them into Excel.
         """
+
+        headers = [
+            "Пользователь",
+            "Дата",
+            "Вопрос",
+            "Фото",
+            "Статус",
+        ]
+
+        for col, title in enumerate(
+            headers,
+            start=1,
+        ):
+
+            cell = ws.cell(
+                row=1,
+                column=col,
+                value=title,
+            )
+
+            cell.fill = ExcelStyle.HEADER_FILL
+            cell.font = ExcelStyle.HEADER_FONT
+            cell.alignment = ExcelStyle.CENTER
+            cell.border = ExcelStyle.BORDER
 
         row = 2
 
@@ -673,56 +825,40 @@ class ExcelExportService:
             ws.cell(
                 row=row,
                 column=1,
-                value=item["user"],
+                value=item.get(
+                    "user",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=2,
-                value=item["date"],
+                value=item.get(
+                    "date",
+                    "",
+                ),
             )
 
             ws.cell(
                 row=row,
                 column=3,
-                value=item["question"],
+                value=item.get(
+                    "question",
+                    "",
+                ),
             )
 
             file_id = item.get(
                 "telegram_file_id",
             )
 
-            if file_id:
+            status = ws.cell(
+                row=row,
+                column=5,
+            )
 
-                try:
-
-                    image_path = await self.photo_export.download(
-                        file_id,
-                    )
-
-                    image = Image(
-                        image_path,
-                    )
-
-                    image.width = 120
-                    image.height = 120
-
-                    ws.add_image(
-                        image,
-                        f"D{row}",
-                    )
-
-                    ws.row_dimensions[row].height = 95
-
-                except Exception:
-
-                    ws.cell(
-                        row=row,
-                        column=4,
-                        value="Ошибка загрузки",
-                    )
-
-            else:
+            if not file_id:
 
                 ws.cell(
                     row=row,
@@ -730,12 +866,63 @@ class ExcelExportService:
                     value="Нет фото",
                 )
 
+                status.value = "❌"
+
+                status.fill = ExcelStyle.ERROR_FILL
+
+                row += 1
+
+                continue
+
+            try:
+
+                image_path = await self.photo_export.download(
+                    file_id,
+                )
+
+                image = Image(
+                    str(image_path),
+                )
+
+                image.width = 120
+                image.height = 120
+
+                ws.add_image(
+                    image,
+                    f"D{row}",
+                )
+
+                ws.row_dimensions[
+                    row
+                ].height = 95
+
+                status.value = "✅"
+
+                status.fill = ExcelStyle.SUCCESS_FILL
+
+            except Exception as e:
+
+                ws.cell(
+                    row=row,
+                    column=4,
+                    value="Ошибка",
+                )
+
+                status.value = "❌"
+
+                status.fill = ExcelStyle.ERROR_FILL
+
+                print(e)
+
             row += 1
 
-        ws.column_dimensions["D"].width = 25
+        ws.column_dimensions["A"].width = 28
+        ws.column_dimensions["B"].width = 15
+        ws.column_dimensions["C"].width = 40
+        ws.column_dimensions["D"].width = 22
+        ws.column_dimensions["E"].width = 12
 
         ws.freeze_panes = "A2"
-
         ws.auto_filter.ref = ws.dimensions
 
     # =====================================================
