@@ -7,6 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.report_generator import ReportGeneratorService
 from app.services.excel_style import ExcelStyle
 
+from openpyxl.drawing.image import Image
+
+from app.core.bot import bot
+from app.services.photo_export import PhotoExportService
+
 
 class ExcelExportService:
     """
