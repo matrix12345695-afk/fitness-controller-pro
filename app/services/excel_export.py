@@ -674,21 +674,21 @@ class ExcelExportService:
             "Фото",
         ]
 
-        for col, title in enumerate(
-            headers,
-            start=1,
-        ):
+for col, title in enumerate(
+    headers,
+    start=1,
+):
 
-            cell = ws.cell(
-                row=1,
-                column=col,
-                value=title,
-            )
+    cell = ws.cell(
+        row=1,
+        column=col,
+        value=title,
+    )
 
-            cell.fill = ExcelStyle.HEADER_FILL
-            cell.font = ExcelStyle.HEADER_FONT
-            cell.alignment = ExcelStyle.CENTER
-            cell.border = ExcelStyle.BORDER
+    cell.fill = ExcelStyle.HEADER_FILL
+    cell.font = ExcelStyle.HEADER_FONT
+    cell.alignment = ExcelStyle.CENTER
+    cell.border = ExcelStyle.BORDER
 
         row = 2
 
