@@ -28,6 +28,10 @@ class ExcelExportService:
             session,
         )
 
+        self.photo_export = PhotoExportService(
+            bot,
+        )
+
         self.output_dir = Path(
             "exports/reports"
         )
@@ -651,82 +655,71 @@ class ExcelExportService:
     # =====================================================
 
     def _fill_photos(
-        self,
-        ws,
-        photos,
+    self,
+    ws,
+    photos,
+):
+    """
+    Prepare photo worksheet.
+
+    Images are inserted later.
+    """
+
+    headers = [
+        "Пользователь",
+        "Дата",
+        "Вопрос",
+        "Фото",
+    ]
+
+    for col, title in enumerate(
+        headers,
+        start=1,
     ):
-        """
-        Fill photos worksheet.
 
-        Пока отображается информация о фотографиях.
-        Позже сюда будет добавлена вставка изображений.
-        """
+        cell = ws.cell(
+            row=1,
+            column=col,
+            value=title,
+        )
 
-        headers = [
-            "Пользователь",
-            "Дата",
-            "Вопрос",
-            "Telegram File ID",
-            "Статус",
-        ]
+        cell.fill = ExcelStyle.HEADER_FILL
+        cell.font = ExcelStyle.HEADER_FONT
+        cell.alignment = ExcelStyle.CENTER
+        cell.border = ExcelStyle.BORDER
 
-        for col, title in enumerate(
-            headers,
-            start=1,
-        ):
+    row = 2
 
-            cell = ws.cell(
-                row=1,
-                column=col,
-                value=title,
-            )
+    for item in photos:
 
-            cell.fill = ExcelStyle.HEADER_FILL
-            cell.font = ExcelStyle.HEADER_FONT
-            cell.alignment = ExcelStyle.CENTER
-            cell.border = ExcelStyle.BORDER
+        ws.cell(
+            row=row,
+            column=1,
+            value=item["user"],
+        )
 
-        row = 2
+        ws.cell(
+            row=row,
+            column=2,
+            value=item["date"],
+        )
 
-        for item in photos:
+        ws.cell(
+            row=row,
+            column=3,
+            value=item["question"],
+        )
 
-            ws.cell(
-                row=row,
-                column=1,
-                value=item.get("user"),
-            )
+        ws.cell(
+            row=row,
+            column=4,
+            value=item["telegram_file_id"],
+        )
 
-            ws.cell(
-                row=row,
-                column=2,
-                value=item.get("date"),
-            )
+        row += 1
 
-            ws.cell(
-                row=row,
-                column=3,
-                value=item.get("question"),
-            )
-
-            ws.cell(
-                row=row,
-                column=4,
-                value=item.get("telegram_file_id"),
-            )
-
-            status = ws.cell(
-                row=row,
-                column=5,
-            )
-
-            status.value = "📷"
-
-            status.fill = ExcelStyle.SUCCESS_FILL
-
-            row += 1
-
-        ws.freeze_panes = "A2"
-        ws.auto_filter.ref = ws.dimensions
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = ws.dimensions
 
     # =====================================================
     # SAVE
