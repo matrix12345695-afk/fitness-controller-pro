@@ -104,20 +104,26 @@ class ReportGeneratorService:
 
     async def answers(
         self,
-        report_date: date | None = None,
-    ) -> list[dict]:
+        date_from: date | None = None,
+        date_to: date | None = None,
+    )
         """
         Export answers for selected date.
         """
 
-        if report_date is None:
-            report_date = date.today()
+        if date_to is None:
+            date_to = date.today()
+            
+        if date_from is None:
+            date_from = date_to
 
         stmt = (
             select(Report)
             .where(
-                Report.report_date == report_date
-            )
+                Report.report_date.between(
+                    date_from,
+                    date_to,
+                )
             .options(
                 selectinload(
                     Report.user
@@ -167,20 +173,26 @@ class ReportGeneratorService:
 
     async def photos(
         self,
-        report_date: date | None = None,
-    ) -> list[dict]:
+        date_from: date | None = None,
+        date_to: date | None = None,
+    )
         """
         Export photos for selected date.
         """
 
-        if report_date is None:
-            report_date = date.today()
+        if date_to is None:
+            date_to = date.today()
+
+        if date_from is None:
+            date_from = date_to
 
         stmt = (
             select(Report)
             .where(
-                Report.report_date == report_date
-            )
+                Report.report_date.between(
+                    date_from,
+                    date_to,
+                )
             .options(
                 selectinload(
                     Report.user
