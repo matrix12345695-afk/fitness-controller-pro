@@ -124,6 +124,7 @@ class ReportGeneratorService:
                     date_from,
                     date_to,
                 )
+            )    
             .options(
                 selectinload(
                     Report.user
