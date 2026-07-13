@@ -169,7 +169,7 @@ async def user_card(
     Show user information.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
 
         await callback.answer()
 
@@ -253,7 +253,7 @@ async def admin_back(
     Back to admin panel.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
 
         await callback.answer()
 
@@ -333,7 +333,7 @@ async def dashboard_remind(
     Reminder confirmation.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
 
         await callback.answer()
 
@@ -395,7 +395,7 @@ async def remind_send(
     Send reminder to all users without today's report.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
 
         await callback.answer()
 
@@ -448,7 +448,7 @@ async def dashboard_excel(
     Excel export menu.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
         await callback.answer()
         return
 
@@ -473,7 +473,7 @@ async def excel_today(
     Generate Excel for today.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
         await callback.answer()
         return
 
@@ -542,7 +542,7 @@ async def excel_yesterday(
     Generate Excel for yesterday.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
         await callback.answer()
         return
 
@@ -595,7 +595,7 @@ async def excel_week(
     callback: CallbackQuery,
 ):
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
         
         await callback.answer()
         return
@@ -636,7 +636,7 @@ async def excel_month(
     callback: CallbackQuery,
 ):
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
         await callback.answer()
         return
 
