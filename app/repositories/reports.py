@@ -1,6 +1,7 @@
 from datetime import date
 
 from sqlalchemy import desc, select
+from sqlalchemy.orm import selectinload
 
 from app.models.report import Report
 from app.repositories.base import BaseRepository
@@ -16,8 +17,15 @@ class ReportRepository(BaseRepository[Report]):
         report_id: int,
     ) -> Report | None:
 
-        stmt = select(Report).where(
-            Report.id == report_id
+        stmt = (
+            select(Report)
+            .options(
+                selectinload(Report.user),
+                selectinload(Report.answers),
+            )
+            .where(
+                Report.id == report_id,
+            )
         )
 
         return await self.scalar(stmt)
@@ -43,9 +51,12 @@ class ReportRepository(BaseRepository[Report]):
         report_date: date,
     ) -> Report | None:
 
-        stmt = select(Report).where(
-            Report.user_id == user_id,
-            Report.report_date == report_date,
+        stmt = (
+            select(Report)
+            .where(
+                Report.user_id == user_id,
+                Report.report_date == report_date,
+            )
         )
 
         return await self.scalar(stmt)
@@ -55,11 +66,9 @@ class ReportRepository(BaseRepository[Report]):
         user_id: int,
     ) -> Report | None:
 
-        today = date.today()
-
         return await self.get_by_user_and_date(
             user_id=user_id,
-            report_date=today,
+            report_date=date.today(),
         )
 
     async def get_user_reports(
@@ -70,10 +79,10 @@ class ReportRepository(BaseRepository[Report]):
         stmt = (
             select(Report)
             .where(
-                Report.user_id == user_id
+                Report.user_id == user_id,
             )
             .order_by(
-                desc(Report.report_date)
+                desc(Report.report_date),
             )
         )
 
@@ -87,10 +96,10 @@ class ReportRepository(BaseRepository[Report]):
         stmt = (
             select(Report)
             .where(
-                Report.report_date == report_date
+                Report.report_date == report_date,
             )
             .order_by(
-                Report.user_id
+                Report.user_id,
             )
         )
 
