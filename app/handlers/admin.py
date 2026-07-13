@@ -489,7 +489,9 @@ async def excel_today(
 
         try:
 
-            filepath = await exporter.create_report()
+            filepath = await exporter.create_report(
+                "today",
+            )    
 
             logger.info(
                 "Excel report generated: {}",
@@ -524,6 +526,142 @@ async def excel_today(
         )
     except Exception:
         logger.exception("Cannot delete %s", filepath)
+
+    await callback.message.answer(
+        "👨‍💼 Панель администратора",
+        reply_markup=admin_menu(),
+    )
+
+@router.callback_query(
+    F.data == "excel_yesterday",
+)
+async def excel_yesterday(
+    callback: CallbackQuery,
+):
+    """
+    Generate Excel for yesterday.
+    """
+
+    if callback.from_user.id != settings.admin_id:
+        await callback.answer()
+        return
+
+    status = await callback.message.edit_text(
+        "⏳ Формирую Excel за вчера..."
+    )
+
+    async with SessionLocal() as session:
+
+        exporter = ExcelExportService(session)
+
+        try:
+
+            filepath = await exporter.create_report(
+                "yesterday",
+            )
+
+        except Exception as e:
+
+            logger.exception(e)
+
+            await status.edit_text(
+                f"❌ Ошибка.\n\n<code>{e}</code>",
+                parse_mode="HTML",
+            )
+
+            return
+
+    await status.edit_text(
+        "✅ Excel сформирован."
+    )
+
+    await callback.message.answer_document(
+        FSInputFile(filepath),
+    )
+
+    Path(filepath).unlink(
+        missing_ok=True,
+    )
+
+    await callback.message.answer(
+        "👨‍💼 Панель администратора",
+        reply_markup=admin_menu(),
+    )
+
+@router.callback_query(
+    F.data == "excel_week",
+)
+async def excel_week(
+    callback: CallbackQuery,
+):
+
+    if callback.from_user.id != settings.admin_id:
+        await callback.answer()
+        return
+
+    status = await callback.message.edit_text(
+        "⏳ Формирую Excel за неделю..."
+    )
+
+    async with SessionLocal() as session:
+
+        exporter = ExcelExportService(session)
+
+        filepath = await exporter.create_report(
+            "week",
+        )
+
+    await status.edit_text(
+        "✅ Excel сформирован."
+    )
+
+    await callback.message.answer_document(
+        FSInputFile(filepath),
+    )
+
+    Path(filepath).unlink(
+        missing_ok=True,
+    )
+
+    await callback.message.answer(
+        "👨‍💼 Панель администратора",
+        reply_markup=admin_menu(),
+    )
+
+@router.callback_query(
+    F.data == "excel_month",
+)
+async def excel_month(
+    callback: CallbackQuery,
+):
+
+    if callback.from_user.id != settings.admin_id:
+        await callback.answer()
+        return
+
+    status = await callback.message.edit_text(
+        "⏳ Формирую Excel за месяц..."
+    )
+
+    async with SessionLocal() as session:
+
+        exporter = ExcelExportService(session)
+
+        filepath = await exporter.create_report(
+            "month",
+        )
+
+    await status.edit_text(
+        "✅ Excel сформирован."
+    )
+
+    await callback.message.answer_document(
+        FSInputFile(filepath),
+    )
+
+    Path(filepath).unlink(
+        missing_ok=True,
+    )
 
     await callback.message.answer(
         "👨‍💼 Панель администратора",
