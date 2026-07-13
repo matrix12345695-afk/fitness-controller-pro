@@ -234,6 +234,7 @@ class ReportGeneratorService:
                     rows.append(
                         {
                             "user": full_name,
+                            "date": report.report_date.strftime("%d.%m.%Y"),
                             "question": answer.question.text_ru,
                             "telegram_file_id": photo.telegram_file_id,
                         }
