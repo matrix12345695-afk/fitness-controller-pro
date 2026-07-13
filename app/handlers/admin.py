@@ -6,9 +6,14 @@ from aiogram.types import (
 
 from app.core.config import settings
 from app.core.database import SessionLocal
+from app.services.registration import RegistrationService
 
 from app.keyboards.admin import users_keyboard
-from app.keyboards.reply import admin_menu
+from app.keyboards.reply import (
+    admin_menu,
+    main_menu_ru,
+    main_menu_uz,
+)
 
 from app.repositories.profiles import ProfileRepository
 from app.services.admin import AdminService
