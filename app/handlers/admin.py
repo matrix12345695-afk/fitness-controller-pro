@@ -51,7 +51,7 @@ async def admin_panel(
     Open admin panel.
     """
 
-    if message.from_user.id != settings.admin_ids:
+    if message.from_user.id not in settings.admin_ids:
 
         await message.answer(
             "⛔ У вас нет доступа."
@@ -130,7 +130,7 @@ async def users_list(
     Show all users.
     """
 
-    if message.from_user.id != settings.admin_ids:
+    if message.from_user.id not in settings.admin_ids:
         return
 
     async with SessionLocal() as session:
@@ -169,7 +169,7 @@ async def user_card(
     Show user information.
     """
 
-    if callback.from_user.id != settings.admin_ids:
+    if callback.from_user.id not in settings.admin_ids:
 
         await callback.answer()
 
@@ -279,7 +279,7 @@ async def today_dashboard(
     Dashboard for today.
     """
 
-    if message.from_user.id != settings.admin_ids:
+    if message.from_user.id not in settings.admin_ids:
         return
 
     async with SessionLocal() as session:
