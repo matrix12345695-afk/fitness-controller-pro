@@ -15,6 +15,7 @@ from app.keyboards.reply import (
 from app.schemas.profile import ProfileCreate
 from app.services.registration import RegistrationService
 from app.states.registration import RegistrationState
+from app.services.statistics import StatisticsService
 
 router = Router()
 
@@ -229,3 +230,85 @@ async def save_weight(
                 message.from_user.id,
             ),
         )
+        
+# ==========================================================
+# MY STATISTICS
+# ==========================================================
+
+@router.message(
+    F.text.in_(
+        [
+            "📊 Статистика",
+            "📊 Statistika",
+        ]
+    )
+)
+async def my_statistics(
+    message: Message,
+):
+    """
+    Show user statistics.
+    """
+
+    async with SessionLocal() as session:
+
+        statistics = StatisticsService(
+            session,
+        )
+
+        stats = await statistics.build_statistics(
+            message.from_user.id,
+        )
+
+    if stats is None:
+
+        await message.answer(
+            "❌ Статистика пока недоступна."
+        )
+
+        return
+
+    profile = stats["profile"]
+
+    full_name = (
+        profile.full_name
+        if profile
+        else message.from_user.full_name
+    )
+
+    text = (
+        "📊 <b>Моя статистика</b>\n\n"
+
+        f"👤 <b>{full_name}</b>\n\n"
+
+        "━━━━━━━━━━━━━━\n\n"
+
+        f"📅 Отчётов: <b>{stats['reports']}</b>\n"
+
+        f"📝 Ответов: <b>{stats['answers']}</b>\n"
+
+        f"📸 Фото: <b>{stats['photos']}</b>\n"
+
+        f"📈 Выполнение: <b>{stats['completion']}%</b>\n\n"
+
+        f"⚖️ Стартовый вес: <b>{stats['start_weight'] or '-'} кг</b>\n"
+
+        f"⚖️ Текущий вес: <b>{stats['current_weight'] or '-'} кг</b>\n"
+
+        f"📉 Изменение: <b>{stats['difference'] or 0} кг</b>"
+    )
+
+    if stats["last_report"]:
+
+        text += (
+            "\n\n"
+            "━━━━━━━━━━━━━━\n\n"
+
+            f"🗓 Последний отчёт:\n"
+            f"<b>{stats['last_report'].created_at.strftime('%d.%m.%Y')}</b>"
+        )
+
+    await message.answer(
+        text,
+        parse_mode="HTML",
+    )        
