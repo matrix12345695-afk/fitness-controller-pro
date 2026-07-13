@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,14 +28,18 @@ class ReportGeneratorService:
 
     async def dashboard(
         self,
-        report_date: date | None = None,
+        date_from: date | None = None,
+        date_to: date | None = None,
     ) -> dict:
         """
         Dashboard statistics.
         """
 
-        if report_date is None:
-            report_date = date.today()
+        if date_to is None:
+            date_to = date.today()
+
+        if date_from is None:
+            date_from = date_to
 
         total_users = (
             await self.session.execute(
@@ -46,8 +50,10 @@ class ReportGeneratorService:
         completed = (
             await self.session.execute(
                 select(func.count(Report.id)).where(
-                    Report.report_date == report_date
-                )
+                    Report.report_date.between(
+                        date_from,
+                        date_to,
+                    )
             )
         ).scalar_one()
 
@@ -77,7 +83,9 @@ class ReportGeneratorService:
         )
 
         return {
-            "date": report_date,
+            "date": date_to,
+            "date_from": date_from,
+            "date_to": date_to,
             "total_users": total_users,
             "completed": completed,
             "not_completed": not_completed,
