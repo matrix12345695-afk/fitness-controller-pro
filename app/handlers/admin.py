@@ -69,6 +69,52 @@ async def admin_panel(
         parse_mode="HTML",
     )
 
+# ==========================================================
+# EXIT ADMIN PANEL
+# ==========================================================
+
+@router.message(
+    F.text == "⬅️ Назад",
+)
+async def exit_admin_panel(
+    message: Message,
+):
+    """
+    Exit admin panel and return to main menu.
+    """
+
+    async with SessionLocal() as session:
+
+        registration = RegistrationService(
+            session,
+        )
+
+        user = await registration.get_user(
+            message.from_user.id,
+        )
+
+    if (
+        user
+        and getattr(user, "language", None)
+        and user.language.value == "uz"
+    ):
+
+        await message.answer(
+            "🏠 Asosiy menyu",
+            reply_markup=main_menu_uz(
+                message.from_user.id,
+            ),
+        )
+
+    else:
+
+        await message.answer(
+            "🏠 Главное меню",
+            reply_markup=main_menu_ru(
+                message.from_user.id,
+            ),
+        )
+
 
 # ==========================================================
 # USERS LIST
