@@ -41,7 +41,7 @@ async def start_command(
         if user:
 
             # Администратор
-            if message.from_user.id == settings.admin_ids:
+            if message.from_user.id in settings.admin_ids:
 
                 await message.answer(
                     text=f"👋 Добро пожаловать обратно, <b>{message.from_user.full_name}</b>!",
