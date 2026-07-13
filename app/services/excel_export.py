@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from openpyxl import Workbook
@@ -47,25 +47,52 @@ class ExcelExportService:
 
     async def create_report(
         self,
-        report_date: date | None = None,
+        period: str = "today",
     ) -> Path:
         """
         Create Excel report.
         """
 
-        if report_date is None:
-            report_date = date.today()
+        today = date.today()
+
+        if period == "today":
+
+            date_from = today
+            date_to = today
+
+        elif period == "yesterday":
+
+            date_from = today - timedelta(days=1)
+            date_to = date_from
+
+        elif period == "week":
+
+            date_from = today - timedelta(days=6)
+            date_to = today
+
+        elif period == "month":
+
+            date_from = today.replace(day=1)
+            date_to = today
+
+        else:
+
+            date_from = today
+            date_to = today
 
         dashboard_data = await self.generator.dashboard(
-            report_date,
+            date_from=date_from,
+            date_to=date_to,
         )
 
         answers = await self.generator.answers(
-            report_date,
+            date_from=date_from,
+            date_to=date_to,
         )
 
         photos = await self.generator.photos(
-            report_date,
+            date_from=date_from,
+            date_to=date_to,
         )
 
         workbook = Workbook()
@@ -93,68 +120,63 @@ class ExcelExportService:
             "Статистика",
         )
 
-        # Dashboard
         self._fill_dashboard(
             dashboard_ws,
             dashboard_data,
         )
 
-        # Answers
         self._fill_answers(
             answers_ws,
             answers,
         )
 
-        # Food
         self._fill_food(
             food_ws,
             answers,
         )
 
-        # Training
         self._fill_training(
             training_ws,
             answers,
         )
 
-        # Photos
         await self._insert_photos(
             photos_ws,
             photos,
         )
 
-        # Statistics
         self._fill_statistics(
             statistics_ws,
             dashboard_data,
             answers,
         )
 
-        # Apply style
         for sheet in workbook.worksheets:
 
             self._apply_table_style(
                 sheet,
             )
 
-            self._auto_width(
-                sheet,
-            )
+            if sheet.title != "Фото":
+
+                self._auto_width(
+                    sheet,
+                )
 
         filename = (
-            f"Fitness_Report_{report_date}.xlsx"
+            f"Fitness_Report_{period}_{date_to}.xlsx"
         )
 
         filepath = self.output_dir / filename
 
-        workbook.save(
+        self._save(
+            workbook,
             filepath,
         )
 
         self.photo_export.cleanup()
 
         return filepath
-
     # =====================================================
     # DASHBOARD
     # =====================================================
