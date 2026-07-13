@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -20,16 +20,38 @@ class Settings(BaseSettings):
     # ==========================================================
 
     bot_token: str = Field(..., alias="BOT_TOKEN")
-    admin_id: int = Field(..., alias="ADMIN_ID")
-    group_id: int = Field(..., alias="GROUP_ID")
+
+    admin_ids: list[int] = Field(
+        ...,
+        alias="ADMIN_IDS",
+    )
+
+    group_id: int = Field(
+        ...,
+        alias="GROUP_ID",
+    )
+
+    @field_validator("admin_ids", mode="before")
+    @classmethod
+    def parse_admin_ids(cls, value):
+        if isinstance(value, str):
+            return [
+                int(x.strip())
+                for x in value.split(",")
+                if x.strip()
+            ]
+        return value
 
     # ==========================================================
     # Database
     # ==========================================================
 
-    database_url: str = Field(..., alias="DATABASE_URL")
+    database_url: str = Field(
+        ...,
+        alias="DATABASE_URL",
+    )
 
-       # ==========================================================
+    # ==========================================================
     # General
     # ==========================================================
 
