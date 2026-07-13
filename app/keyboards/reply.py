@@ -70,14 +70,6 @@ def main_menu_ru(
             ]
         )
 
-    keyboard.append(
-        [
-            KeyboardButton(
-                text="ℹ️ Помощь",
-            )
-        ]
-    )
-
     return ReplyKeyboardMarkup(
         keyboard=keyboard,
         resize_keyboard=True,
@@ -114,13 +106,6 @@ def main_menu_uz(
             ]
         )
 
-    keyboard.append(
-        [
-            KeyboardButton(
-                text="ℹ️ Yordam",
-            )
-        ]
-    )
 
     return ReplyKeyboardMarkup(
         keyboard=keyboard,
