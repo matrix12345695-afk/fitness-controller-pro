@@ -60,7 +60,7 @@ def main_menu_ru(
         ],
     ]
 
-    if telegram_id == settings.admin_id:
+    if telegram_id == settings.admin_ids:
 
         keyboard.append(
             [
@@ -96,7 +96,7 @@ def main_menu_uz(
         ],
     ]
 
-    if telegram_id == settings.admin_id:
+    if telegram_id == settings.admin_ids:
 
         keyboard.append(
             [
