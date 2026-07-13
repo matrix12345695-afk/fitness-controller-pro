@@ -106,7 +106,7 @@ class ReportGeneratorService:
         self,
         date_from: date | None = None,
         date_to: date | None = None,
-    )
+    ) -> list[dict]:
         """
         Export answers for selected date.
         """
@@ -175,7 +175,7 @@ class ReportGeneratorService:
         self,
         date_from: date | None = None,
         date_to: date | None = None,
-    )
+    ) -> list[dict]:
         """
         Export photos for selected date.
         """
@@ -193,6 +193,7 @@ class ReportGeneratorService:
                     date_from,
                     date_to,
                 )
+            )    
             .options(
                 selectinload(
                     Report.user
