@@ -169,7 +169,7 @@ async def user_card(
     Show user information.
     """
 
-    if callback.from_user.id not in settings.admin_ids:
+    if callback.from_user.id != settings.admin_ids:
 
         await callback.answer()
 
@@ -596,6 +596,7 @@ async def excel_week(
 ):
 
     if callback.from_user.id != settings.admin_ids:
+        
         await callback.answer()
         return
 
